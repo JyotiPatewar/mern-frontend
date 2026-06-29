@@ -894,95 +894,11 @@ useEffect(() => {
 
 
 
-const assignLocations = async () => {
-  try {
 
-    await axios.put(
-      Api.assign_Supervisor,
-      {
-        supervisorId:
-          selectedSupervisor,
 
-        locationIds:
-          selectedLocations,
-      }
-    );
 
-    toast.success("Locations assigned successfully");
 
-  } catch (err) {
-    toast.error("Failed to assign locations");
-  }
-};
-
-  // ================= ASSIGN ORDER (LIVE UI UPDATE) =================
-  const handleAssignOrder = async (id) => {
-    try {
-      const order = orderMap[id];
-
-      if (order === undefined || order === "") {
-toast.warning("Enter order first");      }
-
-      const numOrder = Number(order);
-
-      // 🔥 UI UPDATE FIRST
-      setRequests((prev) =>
-        prev.map((req) =>
-          req._id === id
-            ? { ...req, scheduleOrder: numOrder }
-            : req
-        )
-      );
-
-      // 🔥 API CALL (CORRECT)
-      const res = await axios.put(
-        `${Api.update_Emg_Order}/${id}`,
-        {
-          scheduleOrder: numOrder,
-        }
-      );
-
-      console.log("UPDATE RESPONSE:", res.data);
-
-      setOrderMap({});
-      setIsSorted(false);
-
-    } catch (err) {
-      console.log("ASSIGN ERROR:", err.response || err);
-toast.error("Assign failed");
-    }
-  };
-
-  // ================= UPDATE ORDER =================
-  const handleUpdateAssign = async (id) => {
-    try {
-      const order = orderMap[id];
-
-      if (!order && order !== 0) {
-return toast.warning("Enter order first");      }
-
-      setRequests((prev) =>
-        prev.map((req) =>
-          req._id === id
-            ? { ...req, scheduleOrder: Number(order) }
-            : req
-        )
-      );
-
-      await axios.put(
-        `${Api.update_Emg_Order}/${id}`,
-        {
-          scheduleOrder: Number(order),
-        }
-      );
-
-      setOrderMap({});
-      setIsSorted(false);
-
-    } catch (err) {
-toast.error("Failed to update order");
-    }
-  };
+ 
 
   // ================= FINAL SORT =================
 const filteredRequests = requests.filter((req) => {

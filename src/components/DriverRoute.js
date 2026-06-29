@@ -264,7 +264,7 @@
 
 
 
-import { useEffect, useState } from "react";
+import { useEffect, useState,useCallback  } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import Api from "../api/Api";
@@ -283,25 +283,23 @@ const [isNearLocation, setIsNearLocation] =
   useState(null);
 
 
+const getTask = useCallback(async () => {
+  try {
+    const res = await axios.get(Api.get_Todays_Task);
 
-  const getTask = async () => {
-    try {
-      const res = await axios.get(Api.get_Todays_Task);
-      
+    const found = res.data.requests.find(
+      (item) => item._id === id
+    );
 
-      const found = res.data.requests.find(
-        (item) => item._id === id
-      );
-
-      setTask(found);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+    setTask(found);
+  } catch (error) {
+    console.log(error);
+  }
+}, [id]);
 
   useEffect(() => {
     getTask();
-  }, []);
+  }, [getTask]);
 
  const markArrived = async () => {
   if (!isNearLocation) {

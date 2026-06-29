@@ -121,7 +121,6 @@ const handleSubmit = async () => {
   }
 };
 
-  const steps = ["Pending", "Accepted", "Scheduled", "Arrived", "Completed"];
 
 const filteredRequests = myRequests.filter((req) => {
   if (statusFilter === "All") {
