@@ -19,10 +19,7 @@ export default function SupervisorDashboard() {
 
  
 
-useEffect(() => {
-  getLocations();
-  getMyRequests();
-}, [getLocations, getMyRequests]);
+
 
   // ================= LOCATIONS =================
 // const getLocations = async () => {
@@ -192,6 +189,12 @@ const activeRequests = sortedRequests.filter(
     !req.isOverdue ||
     req.status === "Completed"
 );
+
+
+useEffect(() => {
+  getLocations();
+  getMyRequests();
+}, [getLocations, getMyRequests]);
   return (
 
     <div className="min-h-screen bg-[#4CBB17]/20">
