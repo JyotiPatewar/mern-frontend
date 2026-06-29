@@ -823,7 +823,6 @@ function Admin() {
   const [showRequests, setShowRequests] = useState(false);
   const [statusFilter, setStatusFilter] = useState("All");
   const [requests, setRequests] = useState([]);
-  const [orderMap, setOrderMap] = useState({});
   const [isSorted, setIsSorted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
