@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState , useCallback } from "react";
 import axios from "axios";
 import Api from "../api/Api";
 import { toast } from "react-toastify";
@@ -12,7 +12,6 @@ export default function SupervisorDashboard() {
   const [priority, setPriority] = useState("Medium");
   const [showDropdown, setShowDropdown] = useState(false);
 
-  const [allRequests, setAllRequests] = useState([]);
   const [myRequests, setMyRequests] = useState([]);
 
   
@@ -20,54 +19,81 @@ export default function SupervisorDashboard() {
 
  
 
-  useEffect(() => {
-    getLocations();
-    getMyRequests();
-  }, []);
+useEffect(() => {
+  getLocations();
+  getMyRequests();
+}, [getLocations, getMyRequests]);
 
   // ================= LOCATIONS =================
-const getLocations = async () => {
-  try {
+// const getLocations = async () => {
+//   try {
 
+//     const res = await axios.get(
+//       `${Api.get_Supervisor_Locations}/${supervisorId}`
+//     );
+
+//     setLocations(res.data);
+
+//   } catch (err) {
+//     console.log(err);
+//   }
+// };
+
+
+const getLocations = useCallback(async () => {
+  try {
     const res = await axios.get(
       `${Api.get_Supervisor_Locations}/${supervisorId}`
     );
 
     setLocations(res.data);
-
   } catch (err) {
     console.log(err);
   }
-};
+}, [supervisorId]);
 
   // ================= ALL REQUESTS =================
-  const getAllRequests = async () => {
-    try {
-      const res = await axios.get(Api.get_All_Emg_Req);
+  // const getAllRequests = async () => {
+  //   try {
+  //     const res = await axios.get(Api.get_All_Emg_Req);
 
-      const data = res.data?.data || res.data || [];
-      setAllRequests(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.log(err);
-      setAllRequests([]);
-    }
-  };
+  //     const data = res.data?.data || res.data || [];
+  //     setAllRequests(Array.isArray(data) ? data : []);
+  //   } catch (err) {
+  //     console.log(err);
+  //     setAllRequests([]);
+  //   }
+  // };
 
   // ================= MY REQUESTS =================
-  const getMyRequests = async () => {
-    try {
-      const res = await axios.get(
-        `${Api.get_My_Emg_Req}/${supervisorId}`
-      );
-      console.log(res.data);
-      const data = res.data?.data || res.data || [];
-      setMyRequests(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.log(err);
-      setMyRequests([]);
-    }
-  };
+  // const getMyRequests = async () => {
+  //   try {
+  //     const res = await axios.get(
+  //       `${Api.get_My_Emg_Req}/${supervisorId}`
+  //     );
+  //     console.log(res.data);
+  //     const data = res.data?.data || res.data || [];
+  //     setMyRequests(Array.isArray(data) ? data : []);
+  //   } catch (err) {
+  //     console.log(err);
+  //     setMyRequests([]);
+  //   }
+  // };
 
+
+  const getMyRequests = useCallback(async () => {
+  try {
+    const res = await axios.get(
+      `${Api.get_My_Emg_Req}/${supervisorId}`
+    );
+
+    const data = res.data?.data || res.data || [];
+    setMyRequests(Array.isArray(data) ? data : []);
+  } catch (err) {
+    console.log(err);
+    setMyRequests([]);
+  }
+}, [supervisorId]);
   // ================= CREATE REQUEST =================
 const handleSubmit = async () => {
   try {
@@ -90,7 +116,7 @@ const handleSubmit = async () => {
   res.data?.message || "Request Created Successfully"
 );
 
-    getAllRequests();
+    // getAllRequests();
     getMyRequests();
 
     setSelectedLocation(null);
