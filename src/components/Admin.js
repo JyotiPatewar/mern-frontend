@@ -823,18 +823,15 @@ function Admin() {
   const [showRequests, setShowRequests] = useState(false);
   const [statusFilter, setStatusFilter] = useState("All");
   const [requests, setRequests] = useState([]);
-  const [isSorted, setIsSorted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
 
   const [locations, setLocations] = useState([]);
 const [supervisors, setSupervisors] = useState([]);
 
-const [selectedSupervisor, setSelectedSupervisor] =
-  useState("");
 
-const [selectedLocations, setSelectedLocations] =
-  useState([]);
+
+
   // ================= USERS =================
   const fetchUsers = async () => {
     try {
