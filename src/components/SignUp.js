@@ -21,25 +21,55 @@ const SignUp = () => {
     });
   };
 
+// const handleSubmit = async (e) => {
+//   e.preventDefault();
+
+//   try {
+//     const res = await axios.post(
+//       Api.create_user,
+//       formData
+//     );
+
+//     toast.success(
+//       res.data?.message || "Account Created Successfully"
+//     );
+
+//     setTimeout(() => {
+//       navigate("/");
+//     }, 1500);
+
+//   } catch (error) {
+
+//     toast.error(
+//       error.response?.data?.message ||
+//       "Failed to create account"
+//     );
+
+//     console.log(error);
+//   }
+// };
+
+
 const handleSubmit = async (e) => {
   e.preventDefault();
 
   try {
-    const res = await axios.post(
-      Api.create_user,
-      formData
-    );
+    const res = await axios.post(Api.create_user, formData);
 
     toast.success(
       res.data?.message || "Account Created Successfully"
     );
 
-    setTimeout(() => {
-      navigate("/");
-    }, 1500);
+    // ✅ reset form fields
+    setFormData({
+      name: "",
+      mobile: "",
+       email: "",
+      role: ""
+      // jo bhi fields hain yahan add karo
+    });
 
   } catch (error) {
-
     toast.error(
       error.response?.data?.message ||
       "Failed to create account"
