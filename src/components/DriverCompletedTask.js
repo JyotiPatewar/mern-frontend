@@ -13,7 +13,7 @@ useEffect(() => {
 const fetchCompletedTasks = async () => {
   try {
     const res = await axios.get(Api.completed_Task);
-
+console.log(res.data)
     if (res.data.success) {
       setTasks(res.data.data);
     } else {

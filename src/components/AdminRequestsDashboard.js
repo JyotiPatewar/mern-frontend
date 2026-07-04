@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import axios from "axios";
 import Api from "../api/Api";
 import { toast } from "react-toastify";
 
-function Admin() {
-  const [users, setUsers] = useState([]);
-  const [scheduleMap, setScheduleMap] = useState({});
-  const [editingSchedule, setEditingSchedule] = useState({});
-  const [showRequests, setShowRequests] = useState(false);
-  const [statusFilter, setStatusFilter] = useState("All");
+function AdminRequestsDashboard() {
   const [requests, setRequests] = useState([]);
+  const [scheduleMap, setScheduleMap] = useState({});
+ const [users, setUsers] = useState([]);
+  const [editingSchedule, setEditingSchedule] = useState({});
+  const [showRequests, setShowRequests] = useState(true);
+  const [statusFilter, setStatusFilter] = useState("All");
   const [menuOpen, setMenuOpen] = useState(false);
 
 
@@ -19,9 +18,7 @@ const [supervisors, setSupervisors] = useState([]);
 
 
 
-
-  // ================= USERS =================
-  const fetchUsers = async () => {
+ const fetchUsers = async () => {
     try {
       const res = await axios.get(Api.get_All_User);
       setUsers(res.data || []);
@@ -72,6 +69,7 @@ setSupervisors(onlySupervisors);
     }
   };
 useEffect(() => {
+  fetchRequests();
   fetchUsers();
   fetchLocations();
 }, []);
@@ -110,17 +108,15 @@ const filteredRequests = requests.filter((req) => {
 
     const data = scheduleMap[id];
 
-    if (!data?.date || !data?.time) {
-toast.warning("Select Date & Time");    }
+   if (!data?.date || !data?.time) {
+  toast.warning("Select Date & Time");
+  return;
+}
 
-    const selectedTime = data.time;
-
-    if (
-      selectedTime < "08:00" ||
-      selectedTime > "18:00"
-    ) {
-      toast.warning("Time must be between 8:00 AM and 6:00 PM");
-    }
+if (data.time < "08:00" || data.time > "18:00") {
+  toast.warning("Time must be between 8:00 AM and 6:00 PM");
+  return;
+}
 
     await axios.put(`${Api.update_Emg_Order}/${id}`, 
       {
@@ -307,7 +303,7 @@ const renderRequestCard = (req) => (
           req.status === "Completed"
             ? "bg-green-500 text-white px-4 py-1 rounded-full"
             : req.status === "Scheduled"
-            ? "bg-sky-500 text-white px-4 py-1 rounded-full"
+            ? "bg-sky-500 text-white px-1 py-1 rounded-full"
             : req.status === "Pending"
             ? "bg-yellow-500 text-black px-4 py-1 rounded-full"
             : req.status === "Arrived"
@@ -404,7 +400,7 @@ const renderRequestCard = (req) => (
       [req._id]: true,
     }))
   }
-  className="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded-xl font-semibold"
+  className="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-1 rounded-xl font-semibold"
 >
   {req.isOverdue
     ? "Reschedule Task"
@@ -474,370 +470,156 @@ const renderRequestCard = (req) => (
   </div>
 );
 
+  // ================= UI =================
+return (
+<div className="min-h-screen bg-[#4CBB17]/20">
+{/* HEADER */}
+<div className="bg-[#4CBB17]/40 px-4 md:px-8 py-4">
+  <div className="flex flex-col md:flex-row items-center justify-between gap-4">
 
-  return (
-    <div className="min-h-screen bg-[#4CBB17]/20">
-
-      <div >
-
-        {/* HEADER */}
-        {/* HEADER */}
-       <div className="mb-8 bg-[#4CBB17]/40 px-4 md:px-6 py-3">
-  <div className="flex items-center justify-between">
-
-    {/* Logo */}
-    <div>
-      <h1 className="flex items-center gap-2 md:gap-3 text-3xl md:text-5xl font-extrabold text-green-900">
+    <div className="text-center md:text-left">
+      <h1 className="flex items-center justify-center md:justify-start gap-2 md:gap-3 text-2xl sm:text-3xl md:text-5xl font-extrabold text-green-900">
         <img
           src="/garbageVehicle.jpeg"
-          alt=""
-          className="w-10 h-10 md:w-16 md:h-16 object-contain"
+          alt="logo"
+          className="w-10 h-10 md:w-16 md:h-16"
         />
         CleanTrack
       </h1>
 
-      <p className="text-gray-900 text-xs md:text-base mt-1">
+      <p className="text-xs sm:text-sm md:text-base text-gray-800 mt-1">
         Smart Waste Management Control Center
       </p>
     </div>
 
-    {/* Mobile Menu Button */}
-    <button
-      className="md:hidden text-3xl font-bold"
-      onClick={() => setMenuOpen(!menuOpen)}
-    >
-      ☰
-    </button>
-
-    {/* Desktop Menu */}
-    <div className="hidden md:flex items-center gap-8 text-lg font-semibold">
-
-      <Link
-        to="/create-account"
-        className="text-green-900 hover:scale-105 transition"
-      >
-        Create User
-      </Link>
-
-    <Link
-  to="/see-all-req-admin"
-  className="text-green-900 hover:scale-105 transition"
->
-  View Requests
-</Link>
-
-      <Link
-        to="/create-location"
-        className="text-green-900 hover:scale-105 transition"
-      >
-        Create Locations
-      </Link>
-
-        <Link
-        to="/see-all-locations"
-        className="text-green-900 hover:scale-105 transition"
-      >
-        ALL Locations
-      </Link>
-
-      <Link
-        to="/assign-location"
-        className="text-green-900 hover:scale-105 transition"
-      >
-        Assign Zone
-      </Link>
-
-      <Link
-        to="/days-report"
-        className="text-green-900 hover:scale-105 transition"
-      >
-        Days Report
-      </Link>
-
-    </div>
   </div>
-
-  {/* Mobile Dropdown Menu */}
-  {menuOpen && (
-    <div className="md:hidden mt-4 flex flex-col gap-4 text-green-900 font-semibold">
-
-      <Link
-        to="/create-account"
-        onClick={() => setMenuOpen(false)}
-      >
-        Create User
-      </Link>
-
-     <Link
-  to="/see-all-req-admin"
-  onClick={() => setMenuOpen(false)}
->
-  View Requests
-</Link>
-
-      <Link
-        to="/create-location"
-        onClick={() => setMenuOpen(false)}
-      >
-        Create Locations
-      </Link>
-
-      <Link
-        to="/see-all-locations"
-        onClick={() => setMenuOpen(false)}
-      >
-        ALL Locations
-      </Link>
-
-      <Link
-        to="/assign-location"
-        onClick={() => setMenuOpen(false)}
-      >
-        Assign Zone
-      </Link>
-
-      <Link
-        to="/days-report"
-        onClick={() => setMenuOpen(false)}
-      >
-        Days Report
-      </Link>
-
-    </div>
-  )}
 </div>
 
-        <div className="text-center mb-10">
-        <h1 className="text-5xl font-extrabold text-black-900">
-          Admin Dashboard
-        </h1>
-      </div>
 
-        {/* USERS */}
-        <div className="bg-white rounded-2xl shadow-sm border border-[#d6ddd2] p-6 mb-8 m-8">
+    {/* REQUESTS */}
 
-          <div className="flex justify-between items-center mb-6">
-
-            <h2 className="text-2xl font-bold text-green-900">
-              User Management
+    {showRequests && (
+      <div className="px-3 sm:px-6 lg:px-8 pb-8 p-4">
+        
+        {/* Header */}
+        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 mb-6">
+          
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-green-900">
+              Active Requests
             </h2>
 
-            <span className="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-semibold">
-              {users.length} Users
-            </span>
-
+            <p className="text-gray-500 text-sm">
+              Pickup Scheduling & Monitoring
+            </p>
           </div>
 
-          <div className="overflow-x-auto">
+          <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
 
-            <table className="w-full">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full sm:w-52 border border-gray-300 rounded-lg px-4 py-2 bg-white"
+            >
+              <option value="All">All Active</option>
+              <option value="Pending">Pending</option>
+              <option value="Scheduled">Scheduled</option>
+              <option value="Completed">Completed</option>
+              <option value="Overdue">Overdue</option>
+            </select>
 
-              <thead>
-                <tr className="bg-green-900 text-white">
-                  <th className="p-4 text-left">Name</th>
-                  <th className="p-4 text-left">Mobile</th>
-                  <th className="p-4 text-left">Role</th>
-                   <th className="p-4 text-left">Action</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {users.map((user) => (
-                  <tr
-                    key={user._id}
-                    className="border-b hover:bg-green-50 transition"
-                  >
-                    <td className="p-4 font-medium">
-                      {user.name}
-                    </td>
-
-                    <td className="p-4">
-                      {user.mobile}
-                    </td>
-
-                    <td className="p-4">
-                      <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
-                        {user.role}
-                      </span>
-                    </td>
-
-                    <td className="px-4 py-2 text-center">
-  <button
-    onClick={() => handleDelete(user._id)}
-    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
-  >
-    Delete
-  </button>
-</td>
-                  </tr>
-                ))}
-              </tbody>
-
-            </table>
+            <div className="bg-white border border-[#d6ddd2] rounded-xl px-4 py-3 text-center">
+              <span className="font-semibold">Total Requests:</span>{" "}
+              {filteredRequests.length}
+            </div>
 
           </div>
-
         </div>
 
+        {displayedRequests.length === 0 ? (
+          <div className="bg-white rounded-2xl border border-[#d6ddd2] p-8 text-center">
+            No requests found
+          </div>
+        ) : (
+          <div>
 
+            {/* OVERDUE */}
+            {(statusFilter === "All" || statusFilter === "Overdue") &&
+              overdueRequests.length > 0 && (
+                <>
+                  <hr className="my-8" />
 
+                  <div className="flex justify-center mb-6">
+                    <div className="w-full max-w-sm text-center py-3 rounded-xl bg-red-50 border border-red-300 text-red-700 font-bold text-base sm:text-lg">
+                      Overdue Requests
+                    </div>
+                  </div>
 
-        {/* REQUESTS */}
-    {showRequests && (
-  <div className="px-3 sm:px-6 lg:px-8 pb-8">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+                    {overdueRequests.map(renderRequestCard)}
+                  </div>
 
-    {/* Header */}
-    <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 mb-6">
+                  <hr className="my-8" />
+                </>
+              )}
 
-      <div>
-        <h2 className="text-2xl sm:text-3xl font-bold text-green-900">
-          Active Requests
-        </h2>
-
-        <p className="text-gray-500 text-sm">
-          Pickup Scheduling & Monitoring
-        </p>
-      </div>
-
-      <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
-
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="w-full sm:w-52 border border-gray-300 rounded-lg px-4 py-2 bg-white"
-        >
-          <option value="All">All Active</option>
-          <option value="Pending">Pending</option>
-          <option value="Scheduled">Scheduled</option>
-          <option value="Completed">Completed</option>
-          <option value="Overdue">Overdue</option>
-        </select>
-
-        <div className="bg-white border border-[#d6ddd2] rounded-xl px-4 py-3 text-center">
-          <span className="font-semibold">
-            Total Requests:
-          </span>{" "}
-          {filteredRequests.length}
-        </div>
-
-      </div>
-
-    </div>
-
-    {displayedRequests.length === 0 ? (
-
-      <div className="bg-white rounded-2xl border border-[#d6ddd2] p-8 text-center">
-        No requests found
-      </div>
-
-    ) : (
-
-      <div>
-
-        {/* OVERDUE */}
-        {(statusFilter === "All" ||
-          statusFilter === "Overdue") &&
-          overdueRequests.length > 0 && (
-            <>
-
-              <hr className="my-8" />
-
-              <div className="flex justify-center mb-6">
-                <div className="w-full max-w-sm text-center py-3 rounded-xl bg-red-50 border border-red-300 text-red-700 font-bold text-base sm:text-lg">
-                  Overdue Requests
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-                {overdueRequests.map(renderRequestCard)}
-              </div>
-
-              <hr className="my-8" />
-
-            </>
-          )}
-
-        {/* HIGH */}
-
-        {statusFilter !== "Overdue" &&
-          highRequests.length > 0 && (
-            <>
-              <div className="flex justify-center mb-6">
-
-                <div className="w-full max-w-sm text-center py-3 rounded-xl bg-red-50 border border-red-300 text-red-700 font-bold text-base sm:text-lg">
-                  🔴 High Priority Requests
+            {/* HIGH */}
+            {statusFilter !== "Overdue" && highRequests.length > 0 && (
+              <>
+                <div className="flex justify-center mb-6">
+                  <div className="w-full max-w-sm text-center py-3 rounded-xl bg-red-50 border border-red-300 text-red-700 font-bold text-base sm:text-lg">
+                    🔴 High Priority Requests
+                  </div>
                 </div>
 
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-                {highRequests.map(renderRequestCard)}
-              </div>
-
-              <hr className="my-8" />
-            </>
-          )}
-
-        {/* MEDIUM */}
-
-        {statusFilter !== "Overdue" &&
-          mediumRequests.length > 0 && (
-            <>
-              <div className="flex justify-center mt-8 mb-6">
-
-                <div className="w-full max-w-sm text-center py-3 rounded-xl bg-orange-50 border border-orange-300 text-orange-700 font-bold text-base sm:text-lg">
-                  🟠 Medium Priority Requests
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+                  {highRequests.map(renderRequestCard)}
                 </div>
 
-              </div>
+                <hr className="my-8" />
+              </>
+            )}
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-                {mediumRequests.map(renderRequestCard)}
-              </div>
-
-              <hr className="my-8" />
-            </>
-          )}
-
-        {/* LOW */}
-
-        {statusFilter !== "Overdue" &&
-          lowRequests.length > 0 && (
-            <>
-              <div className="flex justify-center mt-8 mb-6">
-
-                <div className="w-full max-w-sm text-center py-3 rounded-xl bg-yellow-50 border border-yellow-300 text-yellow-700 font-bold text-base sm:text-lg">
-                  🟡 Low Priority Requests
+            {/* MEDIUM */}
+            {statusFilter !== "Overdue" && mediumRequests.length > 0 && (
+              <>
+                <div className="flex justify-center mt-8 mb-6">
+                  <div className="w-full max-w-sm text-center py-3 rounded-xl bg-orange-50 border border-orange-300 text-orange-700 font-bold text-base sm:text-lg">
+                    🟠 Medium Priority Requests
+                  </div>
                 </div>
 
-              </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+                  {mediumRequests.map(renderRequestCard)}
+                </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-                {lowRequests.map(renderRequestCard)}
-              </div>
+                <hr className="my-8" />
+              </>
+            )}
 
-              <hr className="my-8" />
-            </>
-          )}
+            {/* LOW */}
+            {statusFilter !== "Overdue" && lowRequests.length > 0 && (
+              <>
+                <div className="flex justify-center mt-8 mb-6">
+                  <div className="w-full max-w-sm text-center py-3 rounded-xl bg-yellow-50 border border-yellow-300 text-yellow-700 font-bold text-base sm:text-lg">
+                    🟡 Low Priority Requests
+                  </div>
+                </div>
 
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+                  {lowRequests.map(renderRequestCard)}
+                </div>
+
+                <hr className="my-8" />
+              </>
+            )}
+
+          </div>
+        )}
       </div>
-
     )}
-
   </div>
-)}
-
-      </div>
-
-    </div>
-  );
+);
 }
 
-export default Admin
-
-
-
-
-
-
-
+export default AdminRequestsDashboard;

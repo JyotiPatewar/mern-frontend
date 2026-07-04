@@ -98,6 +98,15 @@ const Api = {
 
   delete_User:
     "https://full-stack-mern-imj5.onrender.com/api/user/delete-user",
+
+      update_Locations:
+    "https://full-stack-mern-imj5.onrender.com/api/location/update",
+
+
+      delete_Locations:
+    "https://full-stack-mern-imj5.onrender.com/api/location/delete",
+get_Single_Location:
+  "https://full-stack-mern-imj5.onrender.com/api/location/single",
 };
 
 export default Api;

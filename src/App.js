@@ -14,6 +14,8 @@ import DriverCompletedTask from "./components/DriverCompletedTask";
 import AssignLocation from "./components/AssignLocation";
 import LocationCreatedashboard from "./components/LocationCreatedashboard";
 import ShowAllLocations from "./components/ShowAllLocations";
+import AdminRequestsDashboard from "./components/AdminRequestsDashboard";
+import UpdateLocation from "./components/UpdateLocation";
 
 function App() {
   return (
@@ -57,8 +59,18 @@ function App() {
           path="/see-all-locations"
           element={<ShowAllLocations />}
         />
-      </Routes>
+    
 
+           <Route
+          path="/see-all-req-admin"
+          element={<AdminRequestsDashboard />}
+        />
+
+        <Route
+path="/update-location/:id"
+element={<UpdateLocation/>}
+/>
+  </Routes>
       {/* Toast Container */}
       <ToastContainer
         position="top-right"
