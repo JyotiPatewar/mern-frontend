@@ -12,7 +12,6 @@ const SignUp = () => {
     role: "",
   });
 
-  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
