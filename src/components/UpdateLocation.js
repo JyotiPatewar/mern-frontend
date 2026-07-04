@@ -15,25 +15,36 @@ export default function UpdateLocation() {
         latitude: "",
         longitude: ""
     });
-
-    // LOAD SINGLE DATA
+useEffect(() => {
     const loadData = async () => {
         try {
-            const res = await axios.get(
-                `${Api.get_Single_Location}/${id}`
-            );
-
-            // 🔥 IMPORTANT FIX (YOUR BACKEND SHAPE)
+            const res = await axios.get(`${Api.get_Single_Location}/${id}`);
             setForm(res.data?.location || res.data);
-
         } catch {
             toast.error("Failed to load location");
         }
     };
 
-    useEffect(() => {
-        loadData();
-    }, [id]);
+    loadData();
+}, [id]);
+    // // LOAD SINGLE DATA
+    // const loadData = async () => {
+    //     try {
+    //         const res = await axios.get(
+    //             `${Api.get_Single_Location}/${id}`
+    //         );
+
+    //         // 🔥 IMPORTANT FIX (YOUR BACKEND SHAPE)
+    //         setForm(res.data?.location || res.data);
+
+    //     } catch {
+    //         toast.error("Failed to load location");
+    //     }
+    // };
+
+    // useEffect(() => {
+    //     loadData();
+    // }, [id]);
 
     const handleChange = (e) => {
         setForm({
