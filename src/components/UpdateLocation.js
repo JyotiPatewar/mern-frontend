@@ -33,7 +33,7 @@ export default function UpdateLocation() {
 
     useEffect(() => {
         loadData();
-    }, []);
+    }, [id]);
 
     const handleChange = (e) => {
         setForm({
