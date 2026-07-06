@@ -296,13 +296,12 @@ const navigate = useNavigate();
     longitude: "",
   });
 useEffect(() => {
-  if (!id) return;
-
   const loadLocation = async () => {
-    try {
-      const res = await axios.get(`${Api.get_Single_Location}/${id}`);
+    if (!id) return;
 
-      setFormData(res.data?.location || res.data);
+    try {
+      const res = await axios.get(`${Api.get_Single_Location}/${encodeURIComponent(id)}`);
+      setFormData(res.data?.location);
     } catch (error) {
       toast.error("Failed to load location");
     }
@@ -388,11 +387,14 @@ const handleSubmit = async (e) => {
       });
     }
   } catch (error) {
-    toast.error(
-      error.response?.data?.message ||
-      (id ? "Failed to update location" : "Failed to create location")
-    );
-  }
+  console.log("FULL ERROR:", error);
+  console.log("RESPONSE:", error.response?.data);
+
+  toast.error(
+    error.response?.data?.message ||
+    error.message ||
+    (id ? "Failed to update location" : "Failed to create location")
+  );
 };
   return (
     <div className="min-h-screen bg-[#4CBB17]/20">
