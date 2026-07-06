@@ -122,14 +122,12 @@ const handleShow = async () => {
                 <td className="p-3">
                   <div className="flex justify-center gap-2">
 
-                    <button
-                      onClick={() =>
-                        navigate(`/update-location/${loc._id}`)
-                      }
-                      className="bg-blue-600 text-white px-3 py-1 rounded"
-                    >
-                      Update
-                    </button>
+         <button
+  onClick={() => navigate(`/create-location/${loc._id}`)}
+  className="bg-blue-600 text-white px-3 py-1 rounded"
+>
+  Update
+</button>
 
                     <button
                       onClick={() => handleDelete(loc._id)}
@@ -163,14 +161,12 @@ const handleShow = async () => {
 
             <div className="flex gap-2">
 
-              <button
-                onClick={() =>
-                  navigate(`/update-location/${loc._id}`)
-                }
-                className="bg-blue-600 text-white px-3 py-1 rounded text-sm"
-              >
-                Edit
-              </button>
+            <button
+  onClick={() => navigate(`/create-location/${loc._id}`)}
+  className="bg-blue-600 text-white px-3 py-1 rounded text-sm"
+>
+  Edit
+</button>
 
               <button
                 onClick={() => handleDelete(loc._id)}

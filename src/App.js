@@ -15,7 +15,6 @@ import AssignLocation from "./components/AssignLocation";
 import LocationCreatedashboard from "./components/LocationCreatedashboard";
 import ShowAllLocations from "./components/ShowAllLocations";
 import AdminRequestsDashboard from "./components/AdminRequestsDashboard";
-import UpdateLocation from "./components/UpdateLocation";
 
 function App() {
   return (
@@ -66,9 +65,9 @@ function App() {
           element={<AdminRequestsDashboard />}
         />
 
-        <Route
-path="/update-location/:id"
-element={<UpdateLocation/>}
+<Route
+  path="/create-location/:id"
+  element={<LocationCreatedashboard />}
 />
   </Routes>
       {/* Toast Container */}

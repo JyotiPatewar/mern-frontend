@@ -269,7 +269,7 @@ import { toast } from "react-toastify";
     useState([]);
   const [statusFilter, setStatusFilter] =
     useState("All");
-
+const today = new Date().toISOString().split("T")[0];
   const fetchCompletedRequests =
     async () => {
       try {
@@ -298,7 +298,15 @@ import { toast } from "react-toastify";
 const handleSearch = () => {
   if (!fromDate || !toDate) {
 return toast.warning("Select From and To Date");  }
+ const today = new Date().toISOString().split("T")[0];
 
+  if (fromDate > today || toDate > today) {
+    return toast.warning("Future dates are not allowed.");
+  }
+
+  if (fromDate > toDate) {
+    return toast.warning("From Date cannot be later than To Date.");
+  }
   const filtered = allRequests.filter((req) => {
 
     // Date filter
@@ -426,14 +434,13 @@ const formatDateTime = (date) => {
                   From Date
                 </label>
 
-                <input
-                  type="date"
-                  value={fromDate}
-                  onChange={(e) =>
-                    setFromDate(e.target.value)
-                  }
-                  className="w-full border rounded-lg p-3"
-                />
+     <input
+  type="date"
+  value={fromDate}
+  max={today}
+  onChange={(e) => setFromDate(e.target.value)}
+  className="w-full border rounded-lg p-3"
+/>
               </div>
 
               {/* To Date */}
@@ -441,15 +448,14 @@ const formatDateTime = (date) => {
                 <label className="font-semibold block mb-2">
                   To Date
                 </label>
-
-                <input
-                  type="date"
-                  value={toDate}
-                  onChange={(e) =>
-                    setToDate(e.target.value)
-                  }
-                  className="w-full border rounded-lg p-3"
-                />
+<input
+  type="date"
+  value={toDate}
+  max={today}
+  min={fromDate}
+  onChange={(e) => setToDate(e.target.value)}
+  className="w-full border rounded-lg p-3"
+/>
               </div>
 
               {/* Status */}

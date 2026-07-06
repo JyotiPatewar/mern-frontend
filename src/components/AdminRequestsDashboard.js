@@ -17,6 +17,36 @@ function AdminRequestsDashboard() {
 const [supervisors, setSupervisors] = useState([]);
 
 
+const today = new Date().toISOString().split("T")[0];
+
+const getMinTime = (selectedDate) => {
+  if (!selectedDate) return "08:00";
+
+  // Agar selected date aaj hai
+  if (selectedDate === today) {
+    const now = new Date();
+
+    let hours = now.getHours();
+    let minutes = now.getMinutes();
+
+    // Next minute se allow karo
+    minutes += 1;
+    if (minutes >= 60) {
+      hours += 1;
+      minutes = 0;
+    }
+
+    const currentTime = `${String(hours).padStart(2, "0")}:${String(
+      minutes
+    ).padStart(2, "0")}`;
+
+    // Office timing se pehle ho to 08:00
+    return currentTime < "08:00" ? "08:00" : currentTime;
+  }
+
+  // Future date
+  return "08:00";
+};
 
  const fetchUsers = async () => {
     try {
@@ -108,12 +138,21 @@ const filteredRequests = requests.filter((req) => {
 
     const data = scheduleMap[id];
 
-   if (!data?.date || !data?.time) {
-  toast.warning("Select Date & Time");
+const selectedDate = data.date;
+const selectedTime = data.time;
+
+const now = new Date();
+
+const selectedDateTime = new Date(
+  `${selectedDate}T${selectedTime}`
+);
+
+if (selectedDateTime <= now) {
+  toast.warning("Please select the present time or a future time");
   return;
 }
 
-if (data.time < "08:00" || data.time > "18:00") {
+if (selectedTime < "08:00" || selectedTime > "18:00") {
   toast.warning("Time must be between 8:00 AM and 6:00 PM");
   return;
 }
@@ -412,6 +451,7 @@ const renderRequestCard = (req) => (
     {req.status !== "Completed" &&
  editingSchedule[req._id] && (
       <div className="space-y-3 mt-3">
+        <label >Date</label>
       <input
   type="date"
   min={new Date().toISOString().split("T")[0]}
@@ -427,10 +467,10 @@ const renderRequestCard = (req) => (
     }))
   }
 />
-
-        <input
+    <label >Time</label>
+       <input
   type="time"
-  min="08:00"
+  min={getMinTime(scheduleMap[req._id]?.date)}
   max="18:00"
   className="w-full border border-gray-300 rounded-lg p-2"
   value={scheduleMap[req._id]?.time || ""}
