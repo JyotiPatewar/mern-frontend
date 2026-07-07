@@ -510,7 +510,7 @@ longitude: driverLocation?.longitude,
             <p className="text-lg font-semibold">
                Destination:
               <span className="text-green-800 ml-2">
-                {task.location?.location}
+                {task.location?.locationName}
               </span>
             </p>
 {driverLocation && (

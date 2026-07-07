@@ -396,7 +396,6 @@ const handleSubmit = async (e) => {
     (id ? "Failed to update location" : "Failed to create location")
   );
 };
-}
   return (
     <div className="min-h-screen bg-[#4CBB17]/20">
 
@@ -547,4 +546,5 @@ const handleSubmit = async (e) => {
     </div>
   );
 }
+
 export default LocationCreatedashboard;
