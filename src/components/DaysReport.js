@@ -481,11 +481,10 @@ const handleSearch = () => {
   });
 
 
-  setFilteredData(filtered);
-
   if (statusFilter === "All") {
 
-  const todayDate = new Date();
+ const todayDate = new Date();
+todayDate.setHours(0,0,0,0);
 
   const overdue = filtered.filter((req) => {
     if (!req.scheduledDate) return false;
@@ -535,10 +534,10 @@ const handleSearch = () => {
 
 
   setActiveLists({
-    overdue: overdue.sort(prioritySort),
-    scheduled: scheduled.sort(prioritySort),
-    pending: pending.sort(prioritySort)
-  });
+  overdue: overdue.sort(prioritySort),
+  scheduled: scheduled.sort(prioritySort),
+  pending: pending.sort(prioritySort)
+});
 
 }
 
@@ -554,51 +553,254 @@ toast.success(
 
 };
 
-    const downloadPDF = () => {
+const downloadPDF = () => {
 
-      if (filteredData.length === 0) {
-      return toast.warning("No Records can't Generate report");
-      }
+  if (
+    generatedStatus === "All" &&
+    activeLists.overdue.length === 0 &&
+    activeLists.scheduled.length === 0 &&
+    activeLists.pending.length === 0
+  ) {
+    return toast.warning("No Records to generate PDF");
+  }
 
-      const doc = new jsPDF();
+  if (
+    generatedStatus === "Completed" &&
+    filteredData.length === 0
+  ) {
+    return toast.warning("No Records to generate PDF");
+  }
 
-      doc.setFontSize(18);
 
-      doc.text(
-        "CleanTrack Report",
-        14,
-        15
-      );
+ const doc = new jsPDF();
 
- autoTable(doc, {
-  startY: 25,
 
-  head: [[
-    "Location",
-    "Priority",
-    "Created",
-    "Scheduled",
-    "Arrived",
-    "Completed"
-  ]],
+// Heading Style
+doc.setFontSize(22);
 
-  body: filteredData.map((req) => [
-    req.location?.locationName || "-",
-    req.priority || "-",
-    formatDateTime(req.createdAt),
-    req.scheduledDate && req.scheduledTime
-      ? formatDateTime(
+// Green color (RGB)
+doc.setTextColor(0, 128, 0);
+
+
+// Center position calculate
+const title = "CleanTrack Report";
+
+const pageWidth = doc.internal.pageSize.getWidth();
+
+const textWidth = doc.getTextWidth(title);
+
+
+doc.text(
+  title,
+  (pageWidth - textWidth) / 2,
+  18
+);
+
+
+// Reset color for tables/text
+doc.setTextColor(0, 0, 0);
+
+
+// Next content position
+let yPosition = 30;
+
+
+
+// ================= ACTIVE REPORT =================
+
+if (generatedStatus === "All") {
+
+  // -------- OVERDUE --------
+  if (activeLists.overdue.length > 0) {
+
+    doc.setFontSize(16);
+    doc.setTextColor(200,0,0);
+
+    doc.text(
+      `Overdue Requests (${activeLists.overdue.length})`,
+      14,
+      yPosition
+    );
+
+    autoTable(doc,{
+      startY:yPosition + 5,
+
+      head:[[
+        "Location",
+        "Priority",
+        "Created",
+        "Scheduled"
+      ]],
+
+      body:activeLists.overdue.map((req)=>[
+        req.location?.locationName || "-",
+        req.priority || "-",
+        formatDateTime(req.createdAt),
+        formatDateTime(
           `${req.scheduledDate}T${req.scheduledTime}`
         )
-      : "-",
-    formatDateTime(req.arrivedAt),
-    formatDateTime(req.completedAt),
-  ]),
-});
+      ])
+    });
 
-     doc.save(`Report_${fromDate}_${toDate}.pdf`);
-toast.success("PDF downloaded successfully");
-    };
+
+    yPosition = doc.lastAutoTable.finalY + 20;
+
+  }
+
+
+
+  // -------- SCHEDULED --------
+
+  if(activeLists.scheduled.length > 0){
+
+    doc.setFontSize(16);
+    doc.setTextColor(0,0,200);
+
+    doc.text(
+      `Scheduled Requests (${activeLists.scheduled.length})`,
+      14,
+      yPosition
+    );
+
+
+    autoTable(doc,{
+
+      startY:yPosition + 5,
+
+      head:[[
+        "Location",
+        "Priority",
+        "Created",
+        "Scheduled"
+      ]],
+
+      body:activeLists.scheduled.map((req)=>[
+        req.location?.locationName || "-",
+        req.priority || "-",
+        formatDateTime(req.createdAt),
+        formatDateTime(
+          `${req.scheduledDate}T${req.scheduledTime}`
+        )
+      ])
+
+    });
+
+
+    yPosition = doc.lastAutoTable.finalY + 20;
+
+  }
+
+
+
+
+  // -------- PENDING --------
+
+  if(activeLists.pending.length > 0){
+
+    doc.setFontSize(16);
+    doc.setTextColor(200,150,0);
+
+    doc.text(
+      `Pending Requests (${activeLists.pending.length})`,
+      14,
+      yPosition
+    );
+
+
+    autoTable(doc,{
+
+      startY:yPosition + 5,
+
+      head:[[
+        "Location",
+        "Priority",
+        "Created"
+      ]],
+
+      body:activeLists.pending.map((req)=>[
+        req.location?.locationName || "-",
+        req.priority || "-",
+        formatDateTime(req.createdAt)
+      ])
+
+    });
+
+  }
+
+}
+
+
+
+  // ================= COMPLETED REPORT =================
+
+
+  else {
+
+
+    doc.setFontSize(14);
+
+    doc.text(
+      `Completed Records (${filteredData.length})`,
+      14,
+      yPosition
+    );
+
+
+    autoTable(doc,{
+
+      startY:yPosition + 5,
+
+
+      head:[[
+        "Location",
+        "Priority",
+        "Created",
+        "Scheduled",
+        "Arrived",
+        "Completed"
+      ]],
+
+
+      body:filteredData.map((req)=>[
+
+        req.location?.locationName || "-",
+
+        req.priority || "-",
+
+        formatDateTime(req.createdAt),
+
+        req.scheduledDate
+        ?
+        formatDateTime(
+          `${req.scheduledDate}T${req.scheduledTime}`
+        )
+        :
+        "-",
+
+
+        formatDateTime(req.arrivedAt),
+
+        formatDateTime(req.completedAt)
+
+      ])
+
+    });
+
+
+  }
+
+
+
+  doc.save(
+    `CleanTrack_Report_${fromDate}_${toDate}.pdf`
+  );
+
+
+  toast.success(
+    "PDF downloaded successfully"
+  );
+
+};
 
 
 
@@ -715,208 +917,184 @@ const formatDateTime = (date) => {
             </div>
           </div>
 {reportGenerated && (
+  <div className="bg-white rounded-2xl shadow-lg p-6">
 
-<div className="bg-white rounded-2xl shadow-lg p-6">
+    <div className="flex justify-between mb-6">
+      <h2 className="text-2xl font-bold text-green-900">
+        {generatedStatus === "Completed"
+          ? "Completed Records"
+          : "Active Records"}
+      </h2>
 
+      <span className="bg-green-100 text-green-800 px-4 py-2 rounded-full">
+        Total: {filteredData.length}
+      </span>
+    </div>
 
-<div className="flex justify-between mb-6">
+    {generatedStatus === "All" ? (
 
-<h2 className="text-2xl font-bold text-green-900">
-{
- generatedStatus === "Completed"
- ? "Completed Records"
- : "Active Records"
-}
+      activeLists.overdue.length === 0 &&
+      activeLists.scheduled.length === 0 &&
+      activeLists.pending.length === 0 ? (
 
-</h2>
+        <div className="text-center py-10 text-gray-500 text-lg font-medium">
+          No Records Found
+        </div>
 
+      ) : (
 
-<span className="bg-green-100 text-green-800 px-4 py-2 rounded-full">
-Total: {filteredData.length}
-</span>
+        <div className="space-y-8">
 
+          {/* Overdue */}
+          {activeLists.overdue.length > 0 && (
+            <div>
+              <h3 className="text-xl font-bold text-red-700 mb-3">
+                Overdue Requests ({activeLists.overdue.length})
+              </h3>
 
-</div>
-
-
-{
-generatedStatus === "All" ? (
-
-<div className="space-y-8">
-
-
-{[
- {
-   title:"Overdue List",
-   data:activeLists.overdue
- },
- {
-   title:"Scheduled List",
-   data:activeLists.scheduled
- },
- {
-   title:"Pending List",
-   data:activeLists.pending
- }
-
-].map((section)=>(
-<div key={section.title}>
-
-
-<h2 className="text-xl font-bold text-red-700 mb-3">
-{section.title} 
-({section.data.length})
-</h2>
-
-
-<table className="w-full border">
-
-<thead>
-<tr className="bg-green-900 text-white">
-
-<th className="p-3">
-Location
-</th>
-
-<th className="p-3">
-Priority
-</th>
-
-<th className="p-3">
-Created
-</th>
-
-<th className="p-3">
-Scheduled
-</th>
-
-<th className="p-3">
-Status
-</th>
-
-</tr>
-</thead>
-
-
-<tbody>
-  {section.data.length > 0 ? (
-    section.data.map((req) => (
-      <tr
-        key={req._id}
-        className="border-b text-center hover:bg-green-50"
-      >
-        <td className="p-3">
-          {req.location?.locationName || "-"}
-        </td>
-
-        <td className="p-3 font-bold">
-          {req.priority}
-        </td>
-
-        <td className="p-3">
-          {formatDateTime(req.createdAt)}
-        </td>
-
-        <td className="p-3">
-          {req.scheduledDate
-            ? formatDateTime(
-                `${req.scheduledDate}T${req.scheduledTime}`
-              )
-            : "-"}
-        </td>
-
-        <td className="p-3">
-          {req.status}
-        </td>
-      </tr>
-    ))
-  ) : (
-    <tr>
-      <td colSpan="5" className="py-6 text-center text-gray-500">
-        No Records Found
-      </td>
-    </tr>
-  )}
-</tbody>
-
-</table>
-
-
-</div>
-
-))}
-
-
-
-</div>
-
-
-) : (
-              <div className="overflow-x-auto">
-
-                <table className="w-full border">
-
-                  <thead>
-                    <tr className="bg-green-900 text-white">
-                      <th className="p-3 text-center">Location</th>
-                      <th className="p-3 text-center">Priority</th>
-                      <th className="p-3 text-center">Created</th>
-                      <th className="p-3 text-center">Scheduled</th>
-                      <th className="p-3 text-center">Arrived</th>
-                      <th className="p-3 text-center">Completed</th>
+<div className="bg-white rounded-2xl shadow-lg p-6 text-center">
+                <table className="w-full border border-collapse">
+                  <thead className="bg-red-100">
+                    <tr>
+                      <th className="border p-2">Location</th>
+                      <th className="border p-2">Priority</th>
+                      <th className="border p-2">Created</th>
+                      <th className="border p-2">Scheduled</th>
                     </tr>
                   </thead>
 
-               <tbody>
-  {filteredData.length > 0 ? (
-    filteredData.map((req) => (
-      <tr
-        key={req._id}
-        className="border-b hover:bg-green-50 text-center"
-      >
-        <td className="p-3">
-          {req.location?.locationName || "-"}
-        </td>
-
-        <td className="p-3">
-          {req.priority || "-"}
-        </td>
-
-        <td className="p-3">
-          {formatDateTime(req.createdAt)}
-        </td>
-
-        <td className="p-3">
-          {req.scheduledDate && req.scheduledTime
-            ? formatDateTime(
-                `${req.scheduledDate}T${req.scheduledTime}`
-              )
-            : "-"}
-        </td>
-
-        <td className="p-3">
-          {formatDateTime(req.arrivedAt)}
-        </td>
-
-        <td className="p-3 text-green-700 font-semibold">
-          {formatDateTime(req.completedAt)}
-        </td>
-      </tr>
-    ))
-  ) : (
-    <tr>
-      <td colSpan="6" className="py-6 text-center text-gray-500">
-        No Records Found
-      </td>
-    </tr>
-  )}
-</tbody>
+                  <tbody>
+                    {activeLists.overdue.map((req) => (
+                      <tr key={req._id}>
+                        <td className="border p-2">{req.location?.locationName}</td>
+                        <td className="border p-2">{req.priority}</td>
+                        <td className="border p-2">{formatDateTime(req.createdAt)}</td>
+                        <td className="border p-2">
+                          {formatDateTime(`${req.scheduledDate}T${req.scheduledTime}`)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
                 </table>
-
               </div>
-            )}
+            </div>
+          )}
 
-          </div>
+          {/* Scheduled */}
+          {activeLists.scheduled.length > 0 && (
+            <div>
+              <h3 className="text-xl font-bold text-blue-700 mb-3">
+                Scheduled Requests ({activeLists.scheduled.length})
+              </h3>
+
+<div className="bg-white rounded-2xl shadow-lg p-6 text-center">                <table className="w-full border border-collapse">
+                  <thead className="bg-blue-100">
+                    <tr>
+                      <th className="border p-2">Location</th>
+                      <th className="border p-2">Priority</th>
+                      <th className="border p-2">Created</th>
+                      <th className="border p-2">Scheduled</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {activeLists.scheduled.map((req) => (
+                      <tr key={req._id}>
+                        <td className="border p-2">{req.location?.locationName}</td>
+                        <td className="border p-2">{req.priority}</td>
+                        <td className="border p-2">{formatDateTime(req.createdAt)}</td>
+                        <td className="border p-2">
+                          {formatDateTime(`${req.scheduledDate}T${req.scheduledTime}`)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Pending */}
+          {activeLists.pending.length > 0 && (
+            <div>
+              <h3 className="text-xl font-bold text-yellow-700 mb-3">
+                Pending Requests ({activeLists.pending.length})
+              </h3>
+
+<div className="bg-white rounded-2xl shadow-lg p-6 text-center">                <table className="w-full border border-collapse">
+                  <thead className="bg-yellow-100">
+                    <tr>
+                      <th className="border p-2">Location</th>
+                      <th className="border p-2">Priority</th>
+                      <th className="border p-2">Created</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {activeLists.pending.map((req) => (
+                      <tr key={req._id}>
+                        <td className="border p-2">{req.location?.locationName}</td>
+                        <td className="border p-2">{req.priority}</td>
+                        <td className="border p-2">{formatDateTime(req.createdAt)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+        </div>
+
+      )
+
+    ) : (
+
+      filteredData.length === 0 ? (
+
+        <div className="text-center py-10 text-gray-500 text-lg font-medium">
+          No Records Found
+        </div>
+
+      ) : (
+
+        <div className="overflow-x-auto">
+          <table className="w-full border border-collapse">
+            <thead className="bg-green-200">
+              <tr>
+                <th className="border p-2">Location</th>
+                <th className="border p-2">Priority</th>
+                <th className="border p-2">Created</th>
+                <th className="border p-2">Scheduled</th>
+                <th className="border p-2">Arrived</th>
+                <th className="border p-2">Completed</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {filteredData.map((req) => (
+                <tr key={req._id}>
+                  <td className="border p-2">{req.location?.locationName}</td>
+                  <td className="border p-2">{req.priority}</td>
+                  <td className="border p-2">{formatDateTime(req.createdAt)}</td>
+                  <td className="border p-2">
+                    {req.scheduledDate
+                      ? formatDateTime(`${req.scheduledDate}T${req.scheduledTime}`)
+                      : "-"}
+                  </td>
+                  <td className="border p-2">{formatDateTime(req.arrivedAt)}</td>
+                  <td className="border p-2">{formatDateTime(req.completedAt)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+      )
+
+    )}
+
+  </div>
 )}
         </div>
       </div>
