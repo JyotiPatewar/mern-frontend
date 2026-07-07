@@ -9,27 +9,45 @@ export default function ShowAllLocations() {
   const [zone, setZone] = useState("");
   const [locations, setLocations] = useState([]);
   const [supervisor, setSupervisor] = useState("");
-
+const [search, setSearch] = useState("");
+const [filteredLocations, setFilteredLocations] = useState([]);
+const [isShown, setIsShown] = useState(false);
+const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
 const handleShow = async () => {
   if (!zone) return toast.warning("Please select a zone");
+
+  setIsShown(true);
+  setLoading(true);
 
   try {
     const res = await axios.get(
       `${Api.get_Locations_By_Zone}/${encodeURIComponent(zone)}`
     );
 
-    console.log("API RESPONSE:", res.data);
-
     setSupervisor(res.data?.supervisor || "No Supervisor Assigned");
-    setLocations(res.data?.locations || []);
 
-  } catch (err) {
+    const sorted = (res.data?.locations || []).sort((a,b)=>
+      a.locationName.localeCompare(
+        b.locationName,
+        undefined,
+        {
+          numeric:true,
+          sensitivity:"base"
+        }
+      )
+    );
+
+    setLocations(sorted);
+    setFilteredLocations(sorted);
+
+  } catch(err) {
     toast.error("Failed to load locations");
+  } finally {
+    setLoading(false);
   }
 };
-
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this location?")) return;
 
@@ -69,11 +87,18 @@ const handleShow = async () => {
       {/* FILTER */}
       <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mt-5 px-4">
 
-        <select
-          value={zone}
-          onChange={(e) => setZone(e.target.value)}
-          className="border p-2 rounded w-full sm:w-auto"
-        >
+      <select
+  value={zone}
+  onChange={(e) => {
+    setZone(e.target.value);
+    setSearch("");
+    setLocations([]);
+    setFilteredLocations([]);
+    setIsShown(false);
+    setSupervisor("");
+  }}
+  className="border p-2 rounded w-full sm:w-auto"
+>
           <option value="">Select Zone</option>
           <option>Hostel Zone 1</option>
           <option>Hostel Zone 2</option>
@@ -88,6 +113,41 @@ const handleShow = async () => {
           Show
         </button>
       </div>
+
+      {locations.length > 0 && (
+<div className="flex justify-center mt-5 px-4">
+
+<input
+  type="text"
+  placeholder="Search location..."
+  value={search}
+  onChange={(e)=>{
+
+    const value=e.target.value;
+    setSearch(value);
+
+  if(value.length < 1){
+  setFilteredLocations(locations);
+  return;
+}
+
+  const result = locations.filter((loc) => {
+
+  const name = String(loc.locationName).toLowerCase();
+  const searchValue = String(value).toLowerCase();
+
+  return name.includes(searchValue);
+
+});
+
+    setFilteredLocations(result);
+
+  }}
+  className="border p-2 rounded w-full sm:w-96"
+/>
+
+</div>
+)}
 
       {/* SUPERVISOR (CENTERED ALWAYS) */}
      {supervisor && (
@@ -111,45 +171,90 @@ const handleShow = async () => {
             </tr>
           </thead>
 
-          <tbody>
-            {locations.map((loc) => (
-              <tr key={loc._id} className="border">
+<tbody>
 
-                <td className="p-3 font-medium">
-                  {loc.locationName}
-                </td>
+{!isShown ? (
 
-                <td className="p-3">
-                  <div className="flex justify-center gap-2">
+<tr>
+<td colSpan="2" className="p-5 text-gray-600 font-semibold">
+Please select a zone and click Show
+</td>
+</tr>
 
-         <button
-  onClick={() => navigate(`/create-location/${loc._id}`)}
-  className="bg-blue-600 text-white px-3 py-1 rounded"
+) : loading ? (
+
+<tr>
+<td colSpan="2" className="p-5 text-blue-600 font-semibold">
+Loading locations...
+</td>
+</tr>
+
+) : filteredLocations.length > 0 ? (
+
+filteredLocations.map((loc)=>(
+
+<tr key={loc._id} className="border">
+
+<td className="p-3 font-medium">
+{loc.locationName}
+</td>
+
+<td className="p-3">
+<div className="flex justify-center gap-2">
+
+<button
+onClick={() => navigate(`/create-location/${loc._id}`)}
+className="bg-blue-600 text-white px-3 py-1 rounded"
 >
-  Update
+Update
 </button>
 
-                    <button
-                      onClick={() => handleDelete(loc._id)}
-                      className="bg-red-600 text-white px-3 py-1 rounded"
-                    >
-                      Delete
-                    </button>
+<button
+onClick={() => handleDelete(loc._id)}
+className="bg-red-600 text-white px-3 py-1 rounded"
+>
+Delete
+</button>
 
-                  </div>
-                </td>
+</div>
+</td>
 
-              </tr>
-            ))}
-          </tbody>
+</tr>
+
+))
+
+) : (
+
+<tr>
+<td colSpan="2" className="p-5 text-red-600 font-semibold">
+No Location Found
+</td>
+</tr>
+
+)}
+
+</tbody>
 
         </table>
       </div>
 
       {/* ================= MOBILE CARDS ================= */}
       <div className="md:hidden px-4 mt-6 space-y-3">
+{!isShown ? (
 
-        {locations.map((loc) => (
+<div className="bg-white rounded shadow p-4 text-center text-gray-600 font-semibold">
+Please select a zone and click Show
+</div>
+
+) : loading ? (
+
+<div className="bg-white rounded shadow p-4 text-center text-blue-600 font-semibold">
+Loading locations...
+</div>
+
+) : filteredLocations.length > 0 ? (
+
+filteredLocations.map((loc)=>(
           <div
             key={loc._id}
             className="bg-white rounded-lg shadow p-4 flex justify-between items-center"
@@ -178,7 +283,16 @@ const handleShow = async () => {
             </div>
 
           </div>
-        ))}
+          ))
+
+) : (
+
+<div className="bg-white rounded shadow p-4 text-center text-red-600 font-semibold">
+No Location Found
+</div>
+
+)}
+        
 
       </div>
 

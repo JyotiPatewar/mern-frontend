@@ -1,254 +1,3 @@
-// import React, { useEffect, useState } from "react";
-// import axios from "axios";
-// import Api from "../api/Api";
-
-// function DaysReport() {
-//   const [fromDate, setFromDate] = useState("");
-//   const [toDate, setToDate] = useState("");
-
-//   const [allRequests, setAllRequests] =
-//     useState([]);
-
-//   const [filteredData, setFilteredData] =
-//     useState([]);
-
-//   const fetchCompletedRequests =
-//     async () => {
-//       try {
-//         const res = await axios.get(
-//           Api.get_All_Emg_Req
-//         );
-
-//         const data =
-//           res.data?.data ||
-//           res.data?.requests ||
-//           res.data ||
-//           [];
-
-//         const completedOnly =
-//           data.filter(
-//             (req) =>
-//               req.status === "Completed"
-//           );
-
-//         setAllRequests(completedOnly);
-//       } catch (err) {
-//         console.log(err);
-//       }
-//     };
-
-//   useEffect(() => {
-//     fetchCompletedRequests();
-//   }, []);
-
-//   const handleSearch = () => {
-//     if (!fromDate || !toDate) {
-//       return alert(
-//         "Select From and To Date"
-//       );
-//     }
-
-//     const filtered =
-//       allRequests.filter((req) => {
-//         const completedDate =
-//           new Date(req.completedAt);
-
-//         return (
-//           completedDate >=
-//             new Date(fromDate) &&
-//           completedDate <=
-//             new Date(
-//               `${toDate}T23:59:59`
-//             )
-//         );
-//       });
-
-//     setFilteredData(filtered);
-//   };
-
-//   const formatDateTime = (date) => {
-//   if (!date) return "-";
-
-//   return new Date(date).toLocaleString("en-IN", {
-//     day: "2-digit",
-//     month: "short",
-//     year: "numeric",
-//     hour: "2-digit",
-//     minute: "2-digit",
-//     hour12: true,
-//   });
-// };
-
-//   return (
-//     <div className="min-h-screen bg-green-50 ">
-//             <div className="mb-8 bg-[#4CBB17]/40 px-8">
-//         <h1 className="flex items-center gap-3 text-5xl font-extrabold text-green-900">
-//           <img
-//             src="garbageVehicle.jpeg"
-//             alt="CleanTrack Logo"
-//             className="w-16 h-16 object-contain"
-//           />
-
-//           CleanTrack
-//         </h1>
-//         <p className="text-gray-900  p-2  ">
-//           Smart Waste Management Control Center
-//         </p>
-//       </div>
-//       <div className="max-w-7xl mx-auto">
-
-//         <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
-//           <h1 className="text-4xl font-bold text-green-900 mb-6">
-//             Days Report
-//           </h1>
-
-//           <div className="grid md:grid-cols-3 gap-4">
-
-//             <div>
-//               <label className="font-semibold block mb-2">
-//                 From Date
-//               </label>
-
-//               <input
-//                 type="date"
-//                 value={fromDate}
-//                 onChange={(e) =>
-//                   setFromDate(
-//                     e.target.value
-//                   )
-//                 }
-//                 className="w-full border rounded-lg p-3"
-//               />
-//             </div>
-
-//             <div>
-//               <label className="font-semibold block mb-2">
-//                 To Date
-//               </label>
-
-//               <input
-//                 type="date"
-//                 value={toDate}
-//                 onChange={(e) =>
-//                   setToDate(
-//                     e.target.value
-//                   )
-//                 }
-//                 className="w-full border rounded-lg p-3"
-//               />
-//             </div>
-
-//             <div className="flex items-end">
-//               <button
-//                 onClick={handleSearch}
-//                 className="ml-12 bg-green-800 text-white py-3 px-20  rounded-lg hover:bg-green-900"
-//               >
-//                 Generate Report
-//               </button>
-//             </div>
-
-//           </div>
-//         </div>
-
-//         <div className="bg-white rounded-2xl shadow-lg p-6">
-
-//           <div className="flex justify-between mb-6">
-
-//             <h2 className="text-2xl font-bold text-green-900">
-//               Completed Records
-//             </h2>
-
-//             <span className="bg-green-100 text-green-800 px-4 py-2 rounded-full">
-//               Total: {filteredData.length}
-//             </span>
-
-//           </div>
-
-//           {filteredData.length === 0 ? (
-//             <div className="text-center py-10 text-gray-500">
-//               No records found
-//             </div>
-//           ) : (
-//             <div className="overflow-x-auto">
-
-//               <table className="w-full border">
-
-// <thead>
-//   <tr className="bg-green-900 text-white">
-//     <th className="p-3 text-center">Location</th>
-//     <th className="p-3 text-center">Priority</th>
-//     <th className="p-3 text-center">Created</th>
-//     <th className="p-3 text-center">Scheduled</th>
-//     <th className="p-3 text-center">Arrived</th>
-//     <th className="p-3 text-center">Completed</th>
-//   </tr>
-// </thead>
-
-// <tbody>
-//   {filteredData.map((req) => (
-//     <tr
-//       key={req._id}
-//       className="border-b hover:bg-green-50 text-center"
-//     >
-//       <td className="p-3">
-//         {req.location?.locationName}
-//       </td>
-
-//       <td className="p-3">
-//         {req.priority}
-//       </td>
-
-//       <td className="p-3">
-//         {formatDateTime(req.createdAt)}
-//       </td>
-
-//       <td className="p-3">
-//         {req.scheduledDate && req.scheduledTime
-//           ? formatDateTime(
-//               `${req.scheduledDate}T${req.scheduledTime}`
-//             )
-//           : "-"}
-//       </td>
-
-//       <td className="p-3">
-//         {formatDateTime(req.arrivedAt)}
-//       </td>
-
-//       <td className="p-3 text-green-700 font-semibold">
-//         {formatDateTime(req.completedAt)}
-//       </td>
-//     </tr>
-//   ))}
-// </tbody>
-
-//               </table>
-
-//             </div>
-//           )}
-
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default DaysReport;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
@@ -261,9 +10,10 @@ import { toast } from "react-toastify";
  function DaysReport() {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-
+const [reportGenerated, setReportGenerated] = useState(false);
   const [allRequests, setAllRequests] =
     useState([]);
+    const [generatedStatus, setGeneratedStatus] = useState("");
 
   const [filteredData, setFilteredData] =
     useState([]);
@@ -296,9 +46,12 @@ const today = new Date().toISOString().split("T")[0];
   }, []);
 
 const handleSearch = () => {
+
   if (!fromDate || !toDate) {
-return toast.warning("Select From and To Date");  }
- const today = new Date().toISOString().split("T")[0];
+    return toast.warning("Select From and To Date");
+  }
+
+  const today = new Date().toISOString().split("T")[0];
 
   if (fromDate > today || toDate > today) {
     return toast.warning("Future dates are not allowed.");
@@ -307,40 +60,55 @@ return toast.warning("Select From and To Date");  }
   if (fromDate > toDate) {
     return toast.warning("From Date cannot be later than To Date.");
   }
+
+
   const filtered = allRequests.filter((req) => {
 
-    // Date filter
     const requestDate = req.createdAt
       ? new Date(req.createdAt)
       : null;
+
 
     const dateMatch =
       requestDate &&
       requestDate >= new Date(fromDate) &&
       requestDate <= new Date(`${toDate}T23:59:59`);
 
-    // Status filter
+
     let statusMatch = true;
+
 
     if (statusFilter === "All") {
       statusMatch = req.status !== "Completed";
-    } else if (statusFilter === "Completed") {
+    } 
+    else if (statusFilter === "Completed") {
       statusMatch = req.status === "Completed";
     }
 
+
     return dateMatch && statusMatch;
+
   });
 
+
   setFilteredData(filtered);
-  toast.success(
+
+  // report generate hone ke baad hi show hoga
+setFilteredData(filtered);
+setReportGenerated(true);
+setGeneratedStatus(statusFilter);
+
+toast.success(
   `Report generated successfully (${filtered.length} records)`
 );
+
+
 };
 
     const downloadPDF = () => {
 
       if (filteredData.length === 0) {
-      return toast.warning("Generate report first");
+      return toast.warning("No Records can't Generate report");
       }
 
       const doc = new jsPDF();
@@ -497,26 +265,39 @@ const formatDateTime = (date) => {
 
             </div>
           </div>
+{reportGenerated && (
 
-          <div className="bg-white rounded-2xl shadow-lg p-6">
+<div className="bg-white rounded-2xl shadow-lg p-6">
 
-            <div className="flex justify-between mb-6">
 
-              <h2 className="text-2xl font-bold text-green-900">
-                Completed Records
-              </h2>
+<div className="flex justify-between mb-6">
 
-              <span className="bg-green-100 text-green-800 px-4 py-2 rounded-full">
-                Total: {filteredData.length}
-              </span>
+<h2 className="text-2xl font-bold text-green-900">
+{
+ generatedStatus === "Completed"
+ ? "Completed Records"
+ : "Active Records"
+}
 
-            </div>
+</h2>
 
-            {filteredData.length === 0 ? (
-              <div className="text-center py-10 text-gray-500">
-                No records found
-              </div>
-            ) : (
+
+<span className="bg-green-100 text-green-800 px-4 py-2 rounded-full">
+Total: {filteredData.length}
+</span>
+
+
+</div>
+
+
+{
+filteredData.length === 0 ? (
+
+<div className="text-center py-10 text-gray-500">
+No records found
+</div>
+
+) : (
               <div className="overflow-x-auto">
 
                 <table className="w-full border">
@@ -574,6 +355,7 @@ const formatDateTime = (date) => {
             )}
 
           </div>
+)}
         </div>
       </div>
       </div>
