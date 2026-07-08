@@ -107,6 +107,20 @@ const Api = {
     "https://full-stack-mern-imj5.onrender.com/api/location/delete",
 get_Single_Location:
   "https://full-stack-mern-imj5.onrender.com/api/location/single",
+
+  caretaker_Assign_Hostel:
+  "https://full-stack-mern-imj5.onrender.com/api/caretaker/caretaker-assign-hostel",
+
+  get_Caretaker_Reqs:
+  "https://full-stack-mern-imj5.onrender.com/api/caretaker/caretaker-req",
+  
+
+   get_All_Caretakers:
+  "https://full-stack-mern-imj5.onrender.com/api/caretaker/all-caretakers",
+  
+
+  update_Caretaker_Hostel:
+"https://full-stack-mern-imj5.onrender.com/api/caretaker/caretaker-update-hostel",
 };
 
 export default Api;

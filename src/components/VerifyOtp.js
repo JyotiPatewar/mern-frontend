@@ -23,7 +23,7 @@ function VerifyOtp() {
       const res = await axios.post(
         Api.verify_otp,
         {
-          enail,
+          email,
           otp,
         }
       );
@@ -45,8 +45,11 @@ toast.success("Login Successful");
         res.data.role === "driver"
       ) {
         navigate("/driver");
-      } else {
+      } else if (res.data.role === "supervisor") {
         navigate("/supervisor");
+      }
+      else {
+        navigate("/caretaker");
       }
     } catch (err) {
     toast.error(

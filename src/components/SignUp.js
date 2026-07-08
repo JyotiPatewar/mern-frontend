@@ -188,6 +188,10 @@ return (
               <option value="driver">
                 Driver
               </option>
+
+              <option value="caretaker">
+                CareTaker
+              </option>
             </select>
           </div>
 

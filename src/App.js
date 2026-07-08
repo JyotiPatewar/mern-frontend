@@ -15,6 +15,7 @@ import AssignLocation from "./components/AssignLocation";
 import LocationCreatedashboard from "./components/LocationCreatedashboard";
 import ShowAllLocations from "./components/ShowAllLocations";
 import AdminRequestsDashboard from "./components/AdminRequestsDashboard";
+import CareTakerDashboard from "./components/CareTakerDashboard";
 
 function App() {
   return (
@@ -26,6 +27,12 @@ function App() {
           path="/driver-dashboard"
           element={<DriverDashboard />}
         />
+
+        <Route
+          path="/caretaker"
+          element={<CareTakerDashboard />}
+        />
+
         <Route
           path="/supervisor-dashboard"
           element={<SupervisorDashboard />}
