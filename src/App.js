@@ -29,7 +29,7 @@ function App() {
         />
 
         <Route
-          path="/caretaker"
+          path="/caretaker/:id"
           element={<CareTakerDashboard />}
         />
 

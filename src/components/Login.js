@@ -62,6 +62,11 @@ setTimeout(() => {
   } else if (res.data.role === "admin") {
     window.location.href = "/admin";
   }
+  else if (res.data.role?.toLowerCase() === "caretaker") {
+
+  window.location.href = `/caretaker/${res.data.id}`;
+
+}
 }, 1500);
 
     } catch (error) {

@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import axios from "axios";
 import Api from "../api/Api";
 import { toast } from "react-toastify";
-
 import {
   useLocation,
   useNavigate,
@@ -15,7 +14,7 @@ function VerifyOtp() {
   const navigate = useNavigate();
 
   const mobile = location.state?.mobile;
-
+const email = location.state?.email;
   const handleVerify = async (e) => {
     e.preventDefault();
 
@@ -51,7 +50,8 @@ toast.success("Login Successful");
       else {
         navigate("/caretaker");
       }
-    } catch (err) {
+    }
+     catch (err) {
     toast.error(
   error.response?.data?.message ||
   "OTP Verification Failed"

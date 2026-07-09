@@ -2,19 +2,19 @@ import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import Api from "../api/Api";
 import { toast } from "react-toastify";
-
+import { useParams } from "react-router-dom";
 
 export default function CareTakerDashboard(){
-
 
 const [requests,setRequests]=useState([]);
 const [statusFilter,setStatusFilter]=useState("Active");
 const [loading,setLoading]=useState(false);
 
 
-const caretakerId = localStorage.getItem("id");
+const { id } = useParams();
 
-
+console.log("Caretaker Dashboard ID:", id);
+const caretakerId = id;
 
 
 // ================= GET REQUESTS =================
@@ -147,7 +147,7 @@ text-green-900
 
 <img
 
-src="garbageVehicle.jpeg"
+src="/garbageVehicle.jpeg"
 
 className="w-12 h-12 lg:w-16 lg:h-16 object-contain"
 
