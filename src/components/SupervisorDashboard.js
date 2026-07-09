@@ -146,13 +146,32 @@ const handleSubmit = async () => {
 
 
 const filteredRequests = myRequests.filter((req) => {
-  if (statusFilter === "All") {
+
+  if(statusFilter === "All"){
     return req.status !== "Completed";
   }
 
-  return req.status === statusFilter;
-});
 
+  if(statusFilter === "Overdue"){
+    return (
+      req.isOverdue &&
+      req.status !== "Completed"
+    );
+  }
+
+
+  if(statusFilter === "Scheduled"){
+    return (
+      req.status === "Scheduled" &&
+      req.scheduledDate &&
+      !req.isOverdue
+    );
+  }
+
+
+  return req.status === statusFilter;
+
+});
 const sortedRequests = [...filteredRequests].sort((a, b) => {
   // Overdue sabse upar
   if (a.isOverdue && !b.isOverdue) return -1;
@@ -342,6 +361,10 @@ className="w-full md:w-60 border border-gray-300 rounded-xl px-4 py-2"  >
     {/* <option value="Arrived">
       Arrived
     </option> */}
+
+    <option value="Overdue">
+Overdue
+</option>
 
     <option value="Completed">
       Completed
