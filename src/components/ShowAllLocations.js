@@ -416,7 +416,7 @@ export default function ShowAllLocations() {
           Api.get_All_Caretakers
         );
 
-console.log(res.data)
+      console.log(res.data)
       setCaretakers(
         res.data.data
       );
@@ -433,57 +433,57 @@ console.log(res.data)
   };
 
 
-const assignCaretaker = async () => {
+  const assignCaretaker = async () => {
 
-  try {
+    try {
 
-    const data = {
-      caretakerId: selectedCaretaker,
-      locationId: selectedLocation,
-    };
+      const data = {
+        caretakerId: selectedCaretaker,
+        locationId: selectedLocation,
+      };
 
 
-    if(isUpdate){
+      if (isUpdate) {
 
-      await axios.put(
-        Api. update_Caretaker_Hostel,
-        data
+        await axios.put(
+          Api.update_Caretaker_Hostel,
+          data
+        );
+
+        toast.success("Caretaker updated successfully");
+
+      }
+      else {
+
+        await axios.post(
+          Api.caretaker_Assign_Hostel,
+          data
+        );
+
+        toast.success("Caretaker assigned successfully");
+
+      }
+
+
+      setSelectedCaretaker("");
+      setSelectedLocation(null);
+      setIsUpdate(false);
+
+      handleShow();
+
+
+    } catch (error) {
+
+      console.log("FULL ERROR:", error);
+
+      // backend ka error message show hoga
+      toast.error(
+        error.response?.data?.message || "Operation failed"
       );
 
-      toast.success("Caretaker updated successfully");
-
-    }
-    else{
-
-      await axios.post(
-        Api.caretaker_Assign_Hostel,
-        data
-      );
-
-      toast.success("Caretaker assigned successfully");
-
     }
 
-
-    setSelectedCaretaker("");
-    setSelectedLocation(null);
-    setIsUpdate(false);
-
-    handleShow();
-
-
-  } catch(error){
-
-    console.log("FULL ERROR:", error);
-
-    // backend ka error message show hoga
-    toast.error(
-      error.response?.data?.message || "Operation failed"
-    );
-
-  }
-
-};
+  };
   return (
     <div className="min-h-screen bg-green-100">
 
@@ -628,31 +628,31 @@ const assignCaretaker = async () => {
                   <td className="p-3">
 
 
-                 {loc.caretaker ? (
+                    {loc.caretaker ? (
 
-<div>
+                      <div>
 
-<p className="font-semibold text-green-700">
-  {loc.caretaker.name}
-</p>
+                        <p className="font-semibold text-green-700">
+                          {loc.caretaker.name}
+                        </p>
 
-<p className="text-sm">
-  {loc.caretaker.mobile}
-</p>
+                        <p className="text-sm">
+                          {loc.caretaker.mobile}
+                        </p>
 
-<button
-onClick={()=>{
+                        <button
+                          onClick={() => {
 
-setSelectedLocation(loc._id);
+                            setSelectedLocation(loc._id);
 
-setIsUpdate(true);
+                            setIsUpdate(true);
 
-setSelectedCaretaker(
- loc.caretaker._id
-);
+                            setSelectedCaretaker(
+                              loc.caretaker._id
+                            );
 
-}}
-className="
+                          }}
+                          className="
 mt-2
 bg-yellow-500
 text-white
@@ -660,37 +660,37 @@ px-3
 py-1
 rounded
 "
->
-Update CareTaker
-</button>
+                        >
+                          Update CareTaker
+                        </button>
 
 
-</div>
+                      </div>
 
-)
+                    )
                       :
 
                       (
 
                         loc.zone.includes("Hostel") &&
 
-                      <button
-onClick={()=>{
+                        <button
+                          onClick={() => {
 
-setSelectedLocation(loc._id);
-setIsUpdate(false);
+                            setSelectedLocation(loc._id);
+                            setIsUpdate(false);
 
-}}
-className="
+                          }}
+                          className="
 bg-green-600
 text-white
 px-3
 py-1
 rounded
 "
->
-Assign Caretaker
-</button>
+                        >
+                          Assign Caretaker
+                        </button>
                       )
 
                     }
@@ -738,77 +738,77 @@ Assign Caretaker
       </div>
 
       {/* ================= MOBILE CARDS ================= */}
- {/* ================= MOBILE CARDS ================= */}
-<div className="md:hidden px-4 mt-6 space-y-3">
+      {/* ================= MOBILE CARDS ================= */}
+      <div className="md:hidden px-4 mt-6 space-y-3">
 
-{!isShown ? (
+        {!isShown ? (
 
-<div className="bg-white rounded shadow p-4 text-center text-gray-600 font-semibold">
-Please select a zone and click Show
-</div>
+          <div className="bg-white rounded shadow p-4 text-center text-gray-600 font-semibold">
+            Please select a zone and click Show
+          </div>
 
-) : loading ? (
+        ) : loading ? (
 
-<div className="bg-white rounded shadow p-4 text-center text-blue-600 font-semibold">
-Loading locations...
-</div>
+          <div className="bg-white rounded shadow p-4 text-center text-blue-600 font-semibold">
+            Loading locations...
+          </div>
 
-) : filteredLocations.length > 0 ? (
+        ) : filteredLocations.length > 0 ? (
 
-filteredLocations.map((loc)=>(
+          filteredLocations.map((loc) => (
 
-<div
-key={loc._id}
-className="bg-white rounded-lg shadow p-4"
->
+            <div
+              key={loc._id}
+              className="bg-white rounded-lg shadow p-4"
+            >
 
-<div className="flex justify-between items-center">
+              <div className="flex justify-between items-center">
 
-{/* LOCATION */}
-<div>
-<p className="font-bold text-gray-800">
-{loc.locationName}
-</p>
-
-
-{loc.caretaker && (
-
-<div className="mt-2">
-
-<p className="text-sm text-green-700 font-semibold">
-{loc.caretaker.name}
-</p>
-
-<p className="text-xs text-gray-600">
-{loc.caretaker.mobile}
-</p>
-
-</div>
-
-)}
-
-</div>
+                {/* LOCATION */}
+                <div>
+                  <p className="font-bold text-gray-800">
+                    {loc.locationName}
+                  </p>
 
 
+                  {loc.caretaker && (
 
-{/* CARETAKER BUTTON SIDE */}
-<div>
+                    <div className="mt-2">
+
+                      <p className="text-sm text-green-700 font-semibold">
+                        {loc.caretaker.name}
+                      </p>
+
+                      <p className="text-xs text-gray-600">
+                        {loc.caretaker.mobile}
+                      </p>
+
+                    </div>
+
+                  )}
+
+                </div>
 
 
-{loc.caretaker ? (
 
-<button
-onClick={()=>{
+                {/* CARETAKER BUTTON SIDE */}
+                <div>
 
-setSelectedLocation(loc._id);
-setIsUpdate(true);
 
-setSelectedCaretaker(
-loc.caretaker._id
-);
+                  {loc.caretaker ? (
 
-}}
-className="
+                    <button
+                      onClick={() => {
+
+                        setSelectedLocation(loc._id);
+                        setIsUpdate(true);
+
+                        setSelectedCaretaker(
+                          loc.caretaker._id
+                        );
+
+                      }}
+                      className="
 bg-yellow-500
 text-white
 px-3
@@ -816,27 +816,27 @@ py-1
 rounded
 text-sm
 "
->
-Update CareTaker
-</button>
+                    >
+                      Update CareTaker
+                    </button>
 
 
-)
+                  )
 
-:
+                    :
 
-(
+                    (
 
-loc.zone.includes("Hostel") &&
+                      loc.zone.includes("Hostel") &&
 
-<button
-onClick={()=>{
+                      <button
+                        onClick={() => {
 
-setSelectedLocation(loc._id);
-setIsUpdate(false);
+                          setSelectedLocation(loc._id);
+                          setIsUpdate(false);
 
-}}
-className="
+                        }}
+                        className="
 bg-green-600
 text-white
 px-3
@@ -844,29 +844,29 @@ py-1
 rounded
 text-sm
 "
->
-Assign
-</button>
+                      >
+                        Assign
+                      </button>
 
-)
-
-
-}
-
-</div>
+                    )
 
 
-</div>
+                  }
+
+                </div>
+
+
+              </div>
 
 
 
-{/* LOCATION UPDATE DELETE */}
-<div className="flex gap-2 mt-4">
+              {/* LOCATION UPDATE DELETE */}
+              <div className="flex gap-2 mt-4">
 
 
-<button
-onClick={() => navigate(`/create-location/${loc._id}`)}
-className="
+                <button
+                  onClick={() => navigate(`/create-location/${loc._id}`)}
+                  className="
 bg-blue-600
 text-white
 px-3
@@ -875,14 +875,14 @@ rounded
 text-sm
 flex-1
 "
->
-Edit Location
-</button>
+                >
+                  Edit Location
+                </button>
 
 
-<button
-onClick={() => handleDelete(loc._id)}
-className="
+                <button
+                  onClick={() => handleDelete(loc._id)}
+                  className="
 bg-red-600
 text-white
 px-3
@@ -891,35 +891,35 @@ rounded
 text-sm
 flex-1
 "
->
-Delete Location
-</button>
+                >
+                  Delete Location
+                </button>
 
 
-</div>
+              </div>
 
 
 
-</div>
+            </div>
 
-))
+          ))
 
 
-)
+        )
 
-:(
+          : (
 
-<div className="bg-white rounded shadow p-4 text-center text-red-600 font-semibold">
-No Location Found
-</div>
+            <div className="bg-white rounded shadow p-4 text-center text-red-600 font-semibold">
+              No Location Found
+            </div>
 
-)}
+          )}
 
-</div>
+      </div>
 
-                    {selectedLocation && (
+      {selectedLocation && (
 
-<div className="
+        <div className="
 fixed inset-0
 bg-black/40
 flex
@@ -928,7 +928,7 @@ justify-center
 z-50
 ">
 
-<div className="
+          <div className="
 bg-white
 rounded-xl
 shadow-xl
@@ -937,67 +937,67 @@ w-96
 ">
 
 
-<h2 className="text-xl font-bold mb-4 text-center">
-{
- selectedLocation && 
- filteredLocations.find(
-   l=>l._id===selectedLocation
- )?.caretaker
- ? "Update Caretaker"
- : "Assign Caretaker"
-}
-</h2>
+            <h2 className="text-xl font-bold mb-4 text-center">
+              {
+                selectedLocation &&
+                  filteredLocations.find(
+                    l => l._id === selectedLocation
+                  )?.caretaker
+                  ? "Update Caretaker"
+                  : "Assign Caretaker"
+              }
+            </h2>
 
 
-<select
+            <select
 
-value={selectedCaretaker}
+              value={selectedCaretaker}
 
-onChange={(e)=>
-setSelectedCaretaker(e.target.value)
-}
+              onChange={(e) =>
+                setSelectedCaretaker(e.target.value)
+              }
 
-className="
+              className="
 border
 p-2
 rounded
 w-full
 "
 
->
+            >
 
-<option value="">
-Select Caretaker
-</option>
-
-
-{
-caretakers.map((c)=>(
-
-<option
-key={c._id}
-value={c._id}
->
-
-{c.name} - {c.mobile}
-
-</option>
-
-))
-}
+              <option value="">
+                Select Caretaker
+              </option>
 
 
-</select>
+              {
+                caretakers.map((c) => (
+
+                  <option
+                    key={c._id}
+                    value={c._id}
+                  >
+
+                    {c.name} - {c.mobile}
+
+                  </option>
+
+                ))
+              }
 
 
-<div className="flex gap-3 mt-5">
+            </select>
 
 
-<button
+            <div className="flex gap-3 mt-5">
 
-onClick={assignCaretaker}
 
-className="
+              <button
+
+                onClick={assignCaretaker}
+
+                className="
 bg-green-600
 text-white
 px-4
@@ -1006,28 +1006,28 @@ rounded
 flex-1
 ">
 
-{
- filteredLocations.find(
-   l=>l._id===selectedLocation
- )?.caretaker
- ? "Update"
- : "Assign"
-}
+                {
+                  filteredLocations.find(
+                    l => l._id === selectedLocation
+                  )?.caretaker
+                    ? "Update"
+                    : "Assign"
+                }
 
-</button>
+              </button>
 
 
 
-<button
+              <button
 
-onClick={()=>{
+                onClick={() => {
 
-setSelectedLocation(null);
-setSelectedCaretaker("");
+                  setSelectedLocation(null);
+                  setSelectedCaretaker("");
 
-}}
+                }}
 
-className="
+                className="
 bg-gray-400
 text-white
 px-4
@@ -1036,19 +1036,19 @@ rounded
 flex-1
 ">
 
-Cancel
+                Cancel
 
-</button>
-
-
-</div>
+              </button>
 
 
-</div>
+            </div>
 
-</div>
 
-)}
+          </div>
+
+        </div>
+
+      )}
 
     </div>
   );

@@ -627,6 +627,8 @@ req.isOverdue
 
 {/* RIGHT LABELS */}
 
+{/* RIGHT LABELS */}
+
 <div
 className="
 flex
@@ -637,12 +639,10 @@ min-w-[100px]
 "
 >
 
-
-{/* Scheduled */}
+{/* Scheduled Only */}
 
 {
-
-req.scheduledDate &&
+req.scheduledDate && !req.isOverdue && req.status !== "Completed" &&
 
 <span
 className="
@@ -663,12 +663,56 @@ Scheduled
 
 
 
-
-{/* Overdue */}
+{/* Overdue + Scheduled */}
 
 {
+req.isOverdue && req.scheduledDate && req.status !== "Completed" &&
 
-req.isOverdue &&
+<>
+
+<span
+className="
+bg-sky-500
+text-white
+px-3
+py-1
+rounded-full
+text-xs
+font-bold
+whitespace-nowrap
+"
+>
+Scheduled
+</span>
+
+
+<span
+className="
+bg-red-600
+text-white
+px-3
+py-1
+rounded-full
+text-xs
+font-bold
+animate-pulse
+whitespace-nowrap
+"
+>
+OVERDUE
+</span>
+
+</>
+
+}
+
+
+
+
+{/* Only Overdue */}
+
+{
+req.isOverdue && !req.scheduledDate && req.status !== "Completed" &&
 
 <span
 className="
@@ -690,7 +734,8 @@ OVERDUE
 
 
 
-{/* Status */}
+
+{/* Pending / Completed Status */}
 
 {
 
@@ -699,21 +744,14 @@ OVERDUE
 <span
 className={
 
-req.status==="Completed"
+req.status === "Completed"
 
 ?
-"bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold"
+"bg-green-600 text-white px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap"
 
 :
 
-req.status==="Arrived"
-
-?
-"bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold"
-
-:
-
-"bg-yellow-500 text-black px-3 py-1 rounded-full text-xs font-bold"
+"bg-yellow-400 text-black px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap"
 
 }
 >
@@ -724,6 +762,30 @@ req.status==="Arrived"
 
 }
 
+
+
+{/* Completed (Scheduled request complete ho to bhi Completed dikhe) */}
+
+{
+
+req.status === "Completed" &&
+
+<span
+className="
+bg-green-600
+text-white
+px-3
+py-1
+rounded-full
+text-xs
+font-bold
+whitespace-nowrap
+"
+>
+Completed
+</span>
+
+}
 
 
 </div>
@@ -806,7 +868,7 @@ font-medium
 "
 >
 
-Pickup Date:
+Scheduled:
 
 {" "}
 
