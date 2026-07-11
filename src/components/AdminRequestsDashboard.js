@@ -384,7 +384,19 @@ const renderRequestCard = (req) => (
     </div>
 
     {/* Timeline */}
+
+    
     <div className="mt-4 space-y-2 border-t pt-3">
+   {req.scheduledDate && (
+  <p className="text-sm text-sky-700 font-medium">
+    Scheduled:
+    {" "}
+    {new Date(req.scheduledDate).toLocaleDateString("en-IN")}
+    {" | "}
+    {req.scheduledTime}
+  </p>
+)}
+
       {req.arrivedAt && (
         <p className="text-sm text-yellow-700 font-medium">
           Arrived:{" "}

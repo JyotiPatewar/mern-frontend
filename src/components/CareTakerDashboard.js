@@ -578,9 +578,9 @@ transition
 border-2
 
 ${
-req.isOverdue
+req.isOverdue && req.status !== "Completed"
 ?
-"border-red-500 bg-red-50"
+"border-red-400 bg-red-50"
 :
 "border-gray-200 bg-white"
 }
