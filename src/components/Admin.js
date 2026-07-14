@@ -12,7 +12,7 @@ function Admin() {
   const [statusFilter, setStatusFilter] = useState("All");
   const [requests, setRequests] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
-
+const [caretakerRequests,setCaretakerRequests]=useState([]);
 
   const [locations, setLocations] = useState([]);
 const [supervisors, setSupervisors] = useState([]);
@@ -71,10 +71,7 @@ setSupervisors(onlySupervisors);
       setRequests([]);
     }
   };
-useEffect(() => {
-  fetchUsers();
-  fetchLocations();
-}, []);
+
 
 
 
@@ -85,14 +82,27 @@ useEffect(() => {
  
 
   // ================= FINAL SORT =================
-const filteredRequests = requests.filter((req) => {
+const allRequests = [
+  ...requests,
+  ...caretakerRequests
+];
+console.log("ALL REQUESTS", allRequests);
+
+
+const filteredRequests = allRequests.filter((req) => {
+
   if (statusFilter === "All") {
     return req.status !== "Completed";
   }
 
+
   if (statusFilter === "Overdue") {
-    return req.isOverdue && req.status !== "Completed";
+    return (
+      req.isOverdue &&
+      req.status !== "Completed"
+    );
   }
+
 
   if (statusFilter === "Scheduled") {
     return (
@@ -101,9 +111,41 @@ const filteredRequests = requests.filter((req) => {
     );
   }
 
+
   return req.status === statusFilter;
+
 });
 
+
+const fetchAllCaretakerRequests = async()=>{
+
+try{
+
+const res = await axios.get(
+ Api.get_All_Caretaker_Reqs
+);
+console.log(res.data)
+const data =
+res.data?.data ||
+res.data?.requests ||
+res.data ||
+[];
+
+setCaretakerRequests(
+ Array.isArray(data) ? data : []
+);
+
+
+}catch(error){
+
+console.log(
+"caretaker fetch error",
+error
+);
+
+}
+
+};
 
  const handleSchedule = async (id) => {
   try {
@@ -186,9 +228,14 @@ toast.success("Schedule updated successfully");    } catch (error) {
   }
 };
 
-  useEffect(() => {
-  fetchRequests();
-}, []);
+useEffect(()=>{
+
+fetchUsers();
+fetchLocations();
+fetchRequests();
+fetchAllCaretakerRequests();
+
+},[]);
 
 const overdueRequests = filteredRequests
   .filter(
@@ -299,6 +346,19 @@ const renderRequestCard = (req) => (
   >
     📍 {req.location?.locationName}
   </p>
+ 
+  {req.requestedBy?.role === "caretaker" && (
+    <span className="bg-purple-500 text-white px-2 py-1 rounded-full text-xs ml-2">
+      Caretaker
+    </span>
+  )}
+
+  {req.requestedBy?.role === "supervisor" && (
+    <span className="bg-green-600 text-white px-2 py-1 rounded-full text-xs ml-2">
+      Supervisor
+    </span>
+  )}
+
 </div>
       </div>
 

@@ -4,16 +4,16 @@ import Api from "../api/Api";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
 
-export default function CareTakerDashboard(){
+export default function CareTakerDashboard() {
 
-const [requests,setRequests]=useState([]);
-const [statusFilter,setStatusFilter]=useState("Active");
-const [loading,setLoading]=useState(false);
-
+const [requests,setRequests] = useState([]);
+const [statusFilter,setStatusFilter] = useState("Active");
+const [loading,setLoading] = useState(false);
+const [hostel,setHostel] = useState(null);
+const [priority,setPriority] = useState("Medium");
 
 const { id } = useParams();
 
-console.log("Caretaker Dashboard ID:", id);
 const caretakerId = id;
 
 
@@ -21,74 +21,58 @@ const caretakerId = id;
 
 const getRequests = useCallback(async()=>{
 
-
 try{
 
-
 setLoading(true);
-
 
 const res = await axios.get(
 `${Api.get_Caretaker_Reqs}/${caretakerId}`
 );
 
-
-
-setRequests(
-res.data?.data || []
-);
-
-
+setRequests(res.data?.data || []);
 
 }
-
 catch(err){
-
-
-console.log(err);
-
 
 toast.error(
 err.response?.data?.message ||
 "Failed to load requests"
 );
 
-
 }
-
 
 finally{
 
-
 setLoading(false);
 
-
 }
-
-
 
 },[caretakerId]);
 
 
 
 
+// ================= GET HOSTEL =================
 
-useEffect(()=>{
 
+const getHostel = useCallback(async()=>{
 
-if(caretakerId)
-{
+try{
 
-getRequests();
+const res = await axios.get(
+`${Api.get_Caretaker_Hostel}/${caretakerId}`
+);
+
+setHostel(res.data.data);
+
+}
+catch(err){
+
+console.log(err);
 
 }
 
-
-},[caretakerId,getRequests]);
-
-
-
-
+},[caretakerId]);
 
 
 
@@ -96,32 +80,70 @@ getRequests();
 // ================= FILTER =================
 
 
-// Completed ke alawa sabhi status
+const activeRequests = requests.filter(
+(req)=>
+req.status?.trim().toLowerCase() !== "completed"
+);
 
-const activeRequests = requests.filter((req)=>{
-
-
-return req.status !== "Completed";
-
-
-});
-
-
-
-
-// Only Completed
-
-const completedRequests = requests.filter((req)=>{
-
-
-return req.status === "Completed";
-
-
-});
+const completedRequests = requests.filter(
+(req)=>
+req.status?.trim().toLowerCase() === "completed"
+);
 
 
 
+useEffect(()=>{
 
+if(caretakerId){
+
+getRequests();
+getHostel();
+
+}
+
+},[
+caretakerId,
+getRequests,
+getHostel
+]);
+
+
+
+
+// ================= CREATE REQUEST =================
+
+
+const handleSubmit = async()=>{
+
+try{
+
+const res = await axios.post(
+Api.create_Caretaker_Request,
+{
+caretakerId,
+priority
+}
+);
+
+
+toast.success(res.data.message);
+setPriority("Medium");
+getRequests();
+
+
+
+
+}
+catch(err){
+
+toast.error(
+err.response?.data?.message ||
+"Request Failed"
+);
+
+}
+
+};
 
 
 
@@ -129,41 +151,26 @@ return req.status === "Completed";
 
 return (
 
-
 <div className="min-h-screen bg-[#4CBB17]/20">
-
 
 
 <div className="bg-[#4CBB17]/40 px-4 py-4 lg:px-8 mb-6">
 
 
-<h1 className="
-flex items-center gap-3
-text-3xl lg:text-5xl
-font-extrabold
-text-green-900
-">
-
+<h1 className="flex items-center gap-3 text-3xl lg:text-5xl font-extrabold text-green-900">
 
 <img
-
 src="/garbageVehicle.jpeg"
-
 className="w-12 h-12 lg:w-16 lg:h-16 object-contain"
-
 />
 
-
 CleanTrack
-
 
 </h1>
 
 
 <p className="text-gray-800 mt-2">
-
 Smart Waste Management Control Center
-
 </p>
 
 
@@ -175,19 +182,113 @@ Smart Waste Management Control Center
 
 <div className="bg-green-700 text-white py-4 shadow">
 
-
-<h1 className="
-text-center
-text-xl
-sm:text-2xl
-lg:text-3xl
-font-bold
-">
+<h1 className="text-center text-xl sm:text-2xl lg:text-3xl font-bold">
 
 Caretaker Dashboard
 
 </h1>
 
+</div>
+
+
+
+
+
+<div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-4 lg:p-8">
+
+
+
+{/* CREATE REQUEST */}
+
+<div>
+
+<div className="bg-white rounded-2xl shadow p-6">
+
+
+<h2 className="text-2xl font-bold text-green-900 mb-5">
+
+Create Pickup Request
+
+</h2>
+
+
+
+<label className="font-semibold">
+
+Assigned Hostel
+
+</label>
+
+
+<input
+
+value={hostel?.locationName || ""}
+
+readOnly
+
+className="w-full border rounded-xl p-3 mt-2 bg-gray-100"
+
+/>
+
+
+
+
+<label className="font-semibold block mt-5">
+
+Priority
+
+</label>
+
+
+
+<div className="grid grid-cols-3 gap-2 mt-3">
+
+
+{
+["Low","Medium","High"].map((p)=>(
+
+
+<button
+type="button"
+key={p}
+onClick={()=>setPriority(p)}
+className={
+priority===p
+?
+"bg-green-800 text-white py-2 rounded-full"
+:
+"border py-2 rounded-full"
+}
+>
+{p}
+</button>
+
+
+))
+
+}
+
+
+</div>
+
+
+
+
+<button
+
+onClick={handleSubmit}
+
+className="mt-5 w-full bg-green-800 text-white py-3 rounded-xl font-bold"
+
+>
+
+Create Request
+
+</button>
+
+
+
+</div>
 
 </div>
 
@@ -196,41 +297,22 @@ Caretaker Dashboard
 
 
 
-
-<div className="p-4 lg:p-8">
-
-
-<div className="
-bg-white
-rounded-2xl
-shadow
-p-5
-">
+{/* REQUEST LIST */}
 
 
+<div className="lg:col-span-2">
 
 
+<div className="bg-white rounded-2xl shadow p-6">
 
 
-<div className="
-flex
-flex-col
-md:flex-row
-justify-between
-gap-4
-mb-6
-">
+<div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
 
 
 
 <div>
 
-
-<h2 className="
-text-3xl
-font-bold
-text-green-900
-">
+<h2 className="text-3xl font-bold text-green-900">
 
 Pickup Requests
 
@@ -249,40 +331,24 @@ Assigned Hostel Cleaning Requests
 
 
 
-
 <select
-
 
 value={statusFilter}
 
-
 onChange={(e)=>setStatusFilter(e.target.value)}
 
-
-className="
-border
-rounded-xl
-px-4
-py-2
-w-full
-md:w-60
-"
-
+className="border rounded-xl px-4 py-2"
 
 >
 
 
 <option value="Active">
-
 All Active
-
 </option>
 
 
 <option value="Completed">
-
 Completed
-
 </option>
 
 
@@ -290,11 +356,7 @@ Completed
 
 
 
-
 </div>
-
-
-
 
 
 
@@ -303,25 +365,13 @@ Completed
 
 
 {
-
 loading ?
 
-
-
-<div className="
-text-center
-py-10
-text-blue-600
-font-semibold
-">
+<div className="text-center py-10 text-blue-600 font-semibold">
 
 Loading Requests...
 
 </div>
-
-
-
-
 
 
 :
@@ -329,165 +379,92 @@ Loading Requests...
 
 statusFilter==="Active"
 
+
 ?
-
-
-
 
 activeRequests.length===0
 
-
 ?
 
-
 <Empty/>
-
 
 :
 
 
+<>
 
-
-<div>
-
-
-<h2 className="
-text-2xl
-font-bold
-text-green-700
-mb-4
-">
-
+<h2 className="text-2xl font-bold text-green-700 mb-4">
 
 Active Requests ({activeRequests.length})
-
 
 </h2>
 
 
-
-
-
-<div className="
-grid
-grid-cols-1
-md:grid-cols-2
-gap-4
-">
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
 
 {
-
-
 activeRequests.map((req)=>(
 
-
 <RequestCard
-
 key={req._id}
-
 req={req}
-
 />
 
-
 ))
-
-
 }
 
 
-
 </div>
 
-
-</div>
-
-
-
-
-
+</>
 
 
 :
-
-
 
 
 completedRequests.length===0
 
-
 ?
 
-
 <Empty/>
-
 
 :
 
 
+<>
 
-
-<div>
-
-
-<h2 className="
-text-2xl
-font-bold
-text-blue-700
-mb-4
-">
-
+<h2 className="text-2xl font-bold text-blue-700 mb-4">
 
 Completed Requests ({completedRequests.length})
-
 
 </h2>
 
 
-
-
-<div className="
-grid
-grid-cols-1
-md:grid-cols-2
-gap-4
-">
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
 
 {
-
-
 completedRequests.map((req)=>(
 
-
 <RequestCard
-
 key={req._id}
-
 req={req}
-
 />
 
-
 ))
+}
+
+
+</div>
+
+
+</>
 
 
 }
 
 
-
-</div>
-
-
-</div>
-
-
-
-}
-
-
-
 </div>
 
 
@@ -497,16 +474,12 @@ req={req}
 </div>
 
 
+
+</div>
 
 );
 
-
-
 }
-
-
-
-
 
 
 
@@ -517,258 +490,82 @@ req={req}
 
 function Empty(){
 
+return(
 
-return (
-
-
-<div className="
-text-center
-py-16
-">
-
+<div className="text-center py-16">
 
 <div className="text-6xl">
-
 🧹
-
 </div>
 
-
-
-<h2 className="
-text-2xl
-font-bold
-text-gray-500
-mt-3
-">
+<h2 className="text-2xl font-bold text-gray-500 mt-3">
 
 No Requests Found
 
 </h2>
 
-
-
 </div>
-
 
 )
 
-
 }
-
-
-
-
 
 
 
 
 
 // ================= CARD =================
+
+
 function RequestCard({req}){
 
-return (
+const status = req.status?.trim().toLowerCase();
+
+return(
 
 <div
 className={`
 rounded-2xl
 p-5
-hover:shadow-lg
-transition
 border-2
+transition
+hover:shadow-lg
 
 ${
-req.isOverdue && req.status !== "Completed"
+req.isOverdue && status !== "completed"
+
 ?
 "border-red-400 bg-red-50"
+
 :
+
 "border-gray-200 bg-white"
+
 }
 
 `}
 >
 
 
-{/* TOP ROW LOCATION + LABELS */}
-
-<div
-className="
-flex
-justify-between
-items-start
-gap-4
-"
->
+<div className="flex justify-between items-start gap-4">
 
 
-{/* LOCATION */}
+<h3 className="text-xl font-semibold text-green-800">
 
-<h3
-className={`
-text-xl
-font-semibold
-leading-tight
-break-words
-
-${
-req.isOverdue
-?
-"text-red-700"
-:
-"text-green-800"
-}
-
-`}
->
 📍 {req.location?.locationName}
+
 </h3>
 
 
 
-{/* RIGHT LABELS */}
+<div className="flex flex-col gap-2 items-end">
 
-{/* RIGHT LABELS */}
 
-<div
-className="
-flex
-flex-col
-gap-2
-items-end
-min-w-[100px]
-"
->
 
-{/* Scheduled Only */}
+{/* COMPLETED ONLY */}
 
 {
-req.scheduledDate && !req.isOverdue && req.status !== "Completed" &&
-
-<span
-className="
-bg-sky-500
-text-white
-px-3
-py-1
-rounded-full
-text-xs
-font-bold
-whitespace-nowrap
-"
->
-Scheduled
-</span>
-
-}
-
-
-
-{/* Overdue + Scheduled */}
-
-{
-req.isOverdue && req.scheduledDate && req.status !== "Completed" &&
-
-<>
-
-<span
-className="
-bg-sky-500
-text-white
-px-3
-py-1
-rounded-full
-text-xs
-font-bold
-whitespace-nowrap
-"
->
-Scheduled
-</span>
-
-
-<span
-className="
-bg-red-600
-text-white
-px-3
-py-1
-rounded-full
-text-xs
-font-bold
-animate-pulse
-whitespace-nowrap
-"
->
-OVERDUE
-</span>
-
-</>
-
-}
-
-
-
-
-{/* Only Overdue */}
-
-{
-req.isOverdue && !req.scheduledDate && req.status !== "Completed" &&
-
-<span
-className="
-bg-red-600
-text-white
-px-3
-py-1
-rounded-full
-text-xs
-font-bold
-animate-pulse
-whitespace-nowrap
-"
->
-OVERDUE
-</span>
-
-}
-
-
-
-
-{/* Pending / Completed Status */}
-
-{
-
-!req.scheduledDate && !req.isOverdue &&
-
-<span
-className={
-
-req.status === "Completed"
-
-?
-"bg-green-600 text-white px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap"
-
-:
-
-"bg-yellow-400 text-black px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap"
-
-}
->
-
-{req.status}
-
-</span>
-
-}
-
-
-
-{/* Completed (Scheduled request complete ho to bhi Completed dikhe) */}
-
-{
-
-req.status === "Completed" &&
+status==="completed" &&
 
 <span
 className="
@@ -779,73 +576,113 @@ py-1
 rounded-full
 text-xs
 font-bold
-whitespace-nowrap
 "
 >
+
 Completed
+
 </span>
 
 }
 
 
-</div>
 
 
-</div>
-
-
-
-
-
-{/* PRIORITY */}
-
-<div
-className="
-mt-5
-text-sm
-"
->
-
-Priority:
-
-<b>
-{" "}
-{req.priority}
-</b>
-
-</div>
-
-
-
-
-
-{/* CREATED */}
-
-<p
-className="
-text-sm
-text-gray-500
-mt-3
-"
->
-
-Created:
-
-{" "}
+{/* SCHEDULED + OVERDUE */}
 
 {
-new Date(req.createdAt)
-.toLocaleString("en-IN",{
+status!=="completed" &&
+req.scheduledDate &&
 
-day:"2-digit",
-month:"short",
-year:"numeric",
-hour:"2-digit",
-minute:"2-digit",
-hour12:true
+<span
+className="
+bg-sky-500
+text-white
+px-3
+py-1
+rounded-full
+text-xs
+font-bold
+"
+>
 
-})
+Scheduled
+
+</span>
+
 }
+
+
+
+
+{
+status!=="completed" &&
+req.isOverdue &&
+
+<span
+className="
+bg-red-600
+text-white
+px-3
+py-1
+rounded-full
+text-xs
+font-bold
+animate-pulse
+"
+>
+
+OVERDUE
+
+</span>
+
+}
+
+
+
+
+{/* PENDING */}
+
+{
+status!=="completed" &&
+!req.scheduledDate &&
+!req.isOverdue &&
+
+<span
+className="
+bg-yellow-400
+text-black
+px-3
+py-1
+rounded-full
+text-xs
+font-bold
+"
+>
+
+Pending
+
+</span>
+
+}
+
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+<p className="mt-5">
+
+Priority :
+
+<b>{req.priority}</b>
 
 </p>
 
@@ -853,35 +690,28 @@ hour12:true
 
 
 
-{/* PICKUP DATE */}
+<p className="text-sm text-gray-500 mt-2">
+
+Created :
+
+{new Date(req.createdAt).toLocaleString("en-IN")}
+
+</p>
+
+
+
+
+
+{/* Scheduled Date */}
 
 {
-
 req.scheduledDate &&
 
-<p
-className="
-text-sm
-text-sky-700
-mt-2
-font-medium
-"
->
+<p className="text-sm text-sky-700 mt-2 font-medium">
 
-Scheduled:
+Scheduled :
 
-{" "}
-
-{
-new Date(req.scheduledDate)
-.toLocaleDateString("en-IN",{
-
-day:"2-digit",
-month:"short",
-year:"numeric"
-
-})
-}
+{new Date(req.scheduledDate).toLocaleDateString("en-IN")}
 
 {" | "}
 
@@ -895,38 +725,17 @@ year:"numeric"
 
 
 
-{/* ARRIVED */}
+
+{/* Arrived */}
 
 {
-
 req.arrivedAt &&
 
-<p
-className="
-text-sm
-text-orange-700
-mt-2
-font-medium
-"
->
+<p className="text-sm text-orange-700 mt-2 font-medium">
 
-Arrived:
+Arrived :
 
-{" "}
-
-{
-new Date(req.arrivedAt)
-.toLocaleString("en-IN",{
-
-day:"2-digit",
-month:"short",
-year:"numeric",
-hour:"2-digit",
-minute:"2-digit",
-hour12:true
-
-})
-}
+{new Date(req.arrivedAt).toLocaleString("en-IN")}
 
 </p>
 
@@ -936,48 +745,25 @@ hour12:true
 
 
 
-{/* COMPLETED */}
+{/* Completed */}
 
 {
-
 req.completedAt &&
 
-<p
-className="
-text-sm
-text-green-700
-mt-2
-font-medium
-"
->
+<p className="text-sm text-green-700 mt-2 font-medium">
 
-Completed:
+Completed :
 
-{" "}
-
-{
-new Date(req.completedAt)
-.toLocaleString("en-IN",{
-
-day:"2-digit",
-month:"short",
-year:"numeric",
-hour:"2-digit",
-minute:"2-digit",
-hour12:true
-
-})
-}
+{new Date(req.completedAt).toLocaleString("en-IN")}
 
 </p>
 
 }
-
-
 
 
 
 </div>
+
 
 )
 

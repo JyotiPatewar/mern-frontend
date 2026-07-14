@@ -16,7 +16,7 @@ import LocationCreatedashboard from "./components/LocationCreatedashboard";
 import ShowAllLocations from "./components/ShowAllLocations";
 import AdminRequestsDashboard from "./components/AdminRequestsDashboard";
 import CareTakerDashboard from "./components/CareTakerDashboard";
-
+import SuperCareTakerReq from "./components/SuperCareTakerReq"
 function App() {
   return (
     <>
@@ -75,6 +75,11 @@ function App() {
 <Route
   path="/create-location/:id"
   element={<LocationCreatedashboard />}
+/>
+
+<Route
+path="/caretaker-requests"
+element={<SuperCareTakerReq/>}
 />
   </Routes>
       {/* Toast Container */}

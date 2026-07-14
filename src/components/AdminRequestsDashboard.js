@@ -11,8 +11,8 @@ function AdminRequestsDashboard() {
   const [showRequests, setShowRequests] = useState(true);
   const [statusFilter, setStatusFilter] = useState("All");
   const [menuOpen, setMenuOpen] = useState(false);
-
-
+const [caretakerRequests,setCaretakerRequests] = useState([]);
+const [loading,setLoading] = useState(true);
   const [locations, setLocations] = useState([]);
 const [supervisors, setSupervisors] = useState([]);
 
@@ -80,57 +80,120 @@ setSupervisors(onlySupervisors);
   }
 };
   // ================= REQUESTS =================
-  const fetchRequests = async () => {
-    try {
-      const res = await axios.get(Api.get_All_Emg_Req);
+const fetchRequests = async () => {
+  try {
+     setLoading(true);
+    const res = await axios.get(Api.get_All_Emg_Req);
 
-      console.log("RAW RESPONSE:", res.data);
+    console.log("RAW RESPONSE:", res.data);
 
-      const data =
-        res.data?.data ||
-        res.data?.requests ||
-        res.data ||
-        [];
+    const data =
+      res.data?.data ||
+      res.data?.requests ||
+      res.data ||
+      [];
 
-      setRequests(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.log("FETCH ERROR:", err);
-      setRequests([]);
-    }
-  };
-useEffect(() => {
-  fetchRequests();
-  fetchUsers();
-  fetchLocations();
-}, []);
+    setRequests(Array.isArray(data) ? data : []);
+  } catch (err) {
+    console.log("FETCH ERROR:", err);
+    setRequests([]);
+  }
+    finally{
+
+    setLoading(false);
+
+  }
+};
 
 
+
+
+const fetchAllCaretakerRequests = async () => {
+
+  try {
+
+   
+
+    const res = await axios.get(
+      Api.get_All_Caretaker_Reqs
+    );
+    console.log("CARETAKER RESPONSE =>",res.data);
+
+    const data =
+      res.data?.data ||
+      res.data?.requests ||
+      res.data ||
+      [];
+
+    setCaretakerRequests(
+      Array.isArray(data) ? data : []
+    );
+
+  } catch(error){
+
+    console.log(
+      "CARETAKER FETCH ERROR",
+      error
+    );
+
+    setCaretakerRequests([]);
+
+  }
+
+
+};
 
 
 
 
 
  
+const allRequests = [
+  ...requests,
+  ...caretakerRequests
+];
 
+
+console.log(
+ "ALL REQUESTS =>",
+ allRequests
+);
   // ================= FINAL SORT =================
-const filteredRequests = requests.filter((req) => {
-  if (statusFilter === "All") {
+const filteredRequests = allRequests.filter((req)=>{
+
+  if(statusFilter==="All"){
     return req.status !== "Completed";
   }
 
-  if (statusFilter === "Overdue") {
-    return req.isOverdue && req.status !== "Completed";
+
+  if(statusFilter==="Overdue"){
+    return (
+      req.isOverdue &&
+      req.status !== "Completed"
+    );
   }
 
-  if (statusFilter === "Scheduled") {
+
+  if(statusFilter==="Scheduled"){
     return (
-      req.status === "Scheduled" &&
+      req.status==="Scheduled" &&
       !req.isOverdue
     );
   }
 
-  return req.status === statusFilter;
+
+  return req.status===statusFilter;
+
 });
+
+
+useEffect(() => {
+  fetchRequests();
+  fetchUsers();
+  fetchLocations();
+  fetchAllCaretakerRequests();
+}, []);
+
 
 
  const handleSchedule = async (id) => {
@@ -221,9 +284,7 @@ toast.success("Schedule updated successfully");    } catch (error) {
   }
 };
 
-  useEffect(() => {
-  fetchRequests();
-}, []);
+
 
 const overdueRequests = filteredRequests
   .filter(
@@ -334,7 +395,9 @@ const renderRequestCard = (req) => (
   >
     📍 {req.location?.locationName}
   </p>
+
 </div>
+
       </div>
 
       <span
@@ -365,6 +428,16 @@ const renderRequestCard = (req) => (
 
     {/* INFO */}
     <div className="mt-5 space-y-2">
+      <p>
+  <span className="font-semibold">
+    Requested By:
+  </span>{" "}
+  {req.requestedBy?.role === "caretaker"
+    ? "Caretaker"
+    : req.requestedBy?.role === "supervisor"
+    ? "Supervisor"
+    : ""}
+</p>
       <p>
         <span className="font-semibold">Priority:</span>{" "}
         {req.priority}
@@ -431,34 +504,27 @@ const renderRequestCard = (req) => (
  (req.status === "Scheduled" ||
   req.isOverdue) &&
  !editingSchedule[req._id] && (
-        <>
-          <div className="bg-sky-50 p-3 rounded-lg mb-3">
-            <p className="text-sm text-sky-700 font-medium">
-              Scheduled:
-              {" "}
-              {new Date(
-                req.scheduledDate
-              ).toLocaleDateString("en-IN")}
-              {" | "}
-              {req.scheduledTime}
-            </p>
-          </div>
 
-         <button
-  onClick={() =>
-    setEditingSchedule((prev) => ({
-      ...prev,
-      [req._id]: true,
-    }))
-  }
-  className="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-1 rounded-xl font-semibold"
+<button
+onClick={() =>
+setEditingSchedule((prev)=>({
+...prev,
+[req._id]:true
+}))
+}
+className="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-1 rounded-xl font-semibold mt-2"
 >
-  {req.isOverdue
-    ? "Reschedule Task"
-    : "Update Schedule"}
+{
+req.isOverdue
+?
+"Reschedule Task"
+:
+"Update Schedule"
+}
+
 </button>
-        </>
-      )}
+
+)}
 
     {req.status !== "Completed" &&
  editingSchedule[req._id] && (
@@ -588,11 +654,53 @@ return (
           </div>
         </div>
 
-        {displayedRequests.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-[#d6ddd2] p-8 text-center">
-            No requests found
-          </div>
-        ) : (
+        {
+loading ?
+
+(
+<div className="
+bg-white
+rounded-2xl
+border
+border-[#d6ddd2]
+p-8
+text-center
+font-bold
+text-green-700
+">
+
+Loading Requests...
+
+</div>
+)
+
+
+:
+
+
+displayedRequests.length === 0 ?
+
+(
+<div className="
+bg-white
+rounded-2xl
+border
+border-[#d6ddd2]
+p-8
+text-center
+font-bold
+text-red-600
+">
+
+No Requests Found
+
+</div>
+)
+
+
+:
+
+(
           <div>
 
             {/* OVERDUE */}

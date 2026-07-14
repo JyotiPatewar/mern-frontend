@@ -1,6 +1,7 @@
 import { useEffect, useState , useCallback } from "react";
 import axios from "axios";
 import Api from "../api/Api";
+import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
 export default function SupervisorDashboard() {
@@ -8,7 +9,7 @@ export default function SupervisorDashboard() {
   const [search, setSearch] = useState("");
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [statusFilter, setStatusFilter] = useState("All");
-
+const [loading, setLoading] = useState(true);
   const [priority, setPriority] = useState("Medium");
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -42,7 +43,7 @@ const getLocations = useCallback(async () => {
     const res = await axios.get(
       `${Api.get_Supervisor_Locations}/${supervisorId}`
     );
-
+console.log(res.data)
     setLocations(res.data);
   } catch (err) {
     console.log(err);
@@ -77,19 +78,52 @@ const getLocations = useCallback(async () => {
   //   }
   // };
 
+const getMyRequests = useCallback(async () => {
 
-  const getMyRequests = useCallback(async () => {
   try {
+
+    setLoading(true);
+
     const res = await axios.get(
       `${Api.get_My_Emg_Req}/${supervisorId}`
     );
 
+    console.log("MY REQUEST RESPONSE =>", res.data);
+
     const data = res.data?.data || res.data || [];
-    setMyRequests(Array.isArray(data) ? data : []);
-  } catch (err) {
+
+
+    const filtered = data.filter((req) => {
+
+      const createdBy =
+        req.requestedBy?._id || req.requestedBy;
+
+      return createdBy?.toString() === supervisorId?.toString();
+
+    });
+
+
+    console.log("ONLY SUPERVISOR REQUESTS =>", filtered);
+
+
+    setMyRequests(filtered);
+
+
+  } 
+  catch(err){
+
     console.log(err);
+
     setMyRequests([]);
+
   }
+  finally{
+
+    setLoading(false);
+
+  }
+
+
 }, [supervisorId]);
   // ================= CREATE REQUEST =================
 const handleSubmit = async () => {
@@ -219,19 +253,95 @@ useEffect(() => {
     <div className="min-h-screen bg-[#4CBB17]/20">
 
       {/* Header */}
-<div className="mb-6 bg-[#4CBB17]/40 px-4 py-4 lg:px-8">       
-<h1 className="flex items-center justify-center lg:justify-start gap-3 text-3xl lg:text-5xl font-extrabold text-green-900 text-center lg:text-left">          <img
-            src="garbageVehicle.jpeg"
-            alt="CleanTrack Logo"
-            className="w-12 h-12 lg:w-16 lg:h-16 object-contain"
-          />
+<div className="
+mb-6
+bg-[#4CBB17]/40
+px-4
+py-5
+lg:px-8
+">
 
-          CleanTrack
-        </h1>
-        <p className="text-gray-900  p-2  ">
-          Smart Waste Management Control Center
-        </p>
-      </div>
+<div className="
+flex
+flex-col
+sm:flex-row
+sm:items-center
+sm:justify-between
+gap-4
+">
+
+{/* Logo + Title */}
+<div className="
+flex
+items-center
+gap-3
+">
+
+<img
+src="garbageVehicle.jpeg"
+alt="CleanTrack Logo"
+className="
+w-12
+h-12
+sm:w-14
+sm:h-14
+lg:w-16
+lg:h-16
+object-contain
+"
+/>
+
+
+<div>
+<h1 className="
+text-3xl
+sm:text-4xl
+lg:text-5xl
+font-extrabold
+text-green-900
+">
+CleanTrack
+</h1>
+
+<p className="
+text-gray-900
+text-sm
+sm:text-base
+">
+Smart Waste Management Control Center
+</p>
+
+</div>
+
+</div>
+
+
+
+{/* Caretaker Button */}
+<Link
+to="/caretaker-requests"
+className="
+bg-green-800
+text-white
+px-4
+py-2
+sm:px-6
+sm:py-3
+rounded-xl
+font-bold
+shadow-lg
+text-center
+text-sm
+sm:text-base
+"
+>
+👤 View Caretaker Requests
+</Link>
+
+
+</div>
+
+</div>
 
        <div className="bg-green-700 text-white py-4 shadow-lg">
 <h1 className="text-center text-xl sm:text-2xl lg:text-3xl font-bold">          Supervisor DashBoard
@@ -372,16 +482,58 @@ Overdue
   </select>
 
 </div>
+{
+loading ? (
 
-{sortedRequests.length === 0 ? (
-  <div className="flex flex-col items-center justify-center py-16">
-    <div className="text-6xl mb-4">🧹</div>
+<div className="flex flex-col items-center justify-center py-16">
 
-    <h3 className="text-2xl font-bold text-gray-500">
-      No Requests Found
-    </h3>
-  </div>
-) : (
+
+
+
+<h3 className="
+text-xl
+font-bold
+text-green-800
+mt-4
+">
+Loading Requests...
+</h3>
+
+
+</div>
+
+
+)
+
+:
+
+sortedRequests.length === 0 ? (
+
+
+<div className="flex flex-col items-center justify-center py-16">
+
+<div className="text-6xl mb-4">
+🧹
+</div>
+
+
+<h3 className="
+text-2xl
+font-bold
+text-gray-500
+">
+No Requests Found
+</h3>
+
+
+</div>
+
+
+)
+
+:
+
+(
   <div className="space-y-8">
 
     {/* OVERDUE REQUESTS */}
