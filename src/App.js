@@ -17,12 +17,20 @@ import ShowAllLocations from "./components/ShowAllLocations";
 import AdminRequestsDashboard from "./components/AdminRequestsDashboard";
 import CareTakerDashboard from "./components/CareTakerDashboard";
 import SuperCareTakerReq from "./components/SuperCareTakerReq"
+
+
 function App() {
   return (
     <>
       <Routes>
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/" element={<Login />} />
+        <Route
+          path="/admin" element={<Admin />}
+        />
+
+        <Route
+          path="/" element={<Login />}
+
+        />
         <Route
           path="/driver-dashboard"
           element={<DriverDashboard />}
@@ -65,23 +73,25 @@ function App() {
           path="/see-all-locations"
           element={<ShowAllLocations />}
         />
-    
 
-           <Route
+
+        <Route
           path="/see-all-req-admin"
           element={<AdminRequestsDashboard />}
         />
 
-<Route
-  path="/create-location/:id"
-  element={<LocationCreatedashboard />}
-/>
+        <Route
+          path="/create-location/:id"
+          element={<LocationCreatedashboard />}
+        />
 
-<Route
-path="/caretaker-requests"
-element={<SuperCareTakerReq/>}
-/>
-  </Routes>
+        <Route
+          path="/caretaker-requests"
+          element={<SuperCareTakerReq />}
+        />
+
+      </Routes>
+      
       {/* Toast Container */}
       <ToastContainer
         position="top-right"
@@ -91,6 +101,7 @@ element={<SuperCareTakerReq/>}
         closeOnClick
         pauseOnHover
       />
+
     </>
   );
 }

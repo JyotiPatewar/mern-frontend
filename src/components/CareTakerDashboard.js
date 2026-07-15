@@ -6,357 +6,357 @@ import { useParams } from "react-router-dom";
 
 export default function CareTakerDashboard() {
 
-const [requests,setRequests] = useState([]);
-const [statusFilter,setStatusFilter] = useState("Active");
-const [loading,setLoading] = useState(false);
-const [hostel,setHostel] = useState(null);
-const [priority,setPriority] = useState("Medium");
+    const [requests, setRequests] = useState([]);
+    const [statusFilter, setStatusFilter] = useState("Active");
+    const [loading, setLoading] = useState(false);
+    const [hostel, setHostel] = useState(null);
+    const [priority, setPriority] = useState("Medium");
 
-const { id } = useParams();
+    const { id } = useParams();
 
-const caretakerId = id;
+    const caretakerId = id;
 
 
-// ================= GET REQUESTS =================
+    // ================= GET REQUESTS =================
 
-const getRequests = useCallback(async()=>{
+    const getRequests = useCallback(async () => {
 
-try{
+        try {
 
-setLoading(true);
+            setLoading(true);
 
-const res = await axios.get(
-`${Api.get_Caretaker_Reqs}/${caretakerId}`
-);
+            const res = await axios.get(
+                `${Api.get_Caretaker_Reqs}/${caretakerId}`
+            );
 
-setRequests(res.data?.data || []);
+            setRequests(res.data?.data || []);
 
-}
-catch(err){
+        }
+        catch (err) {
 
-toast.error(
-err.response?.data?.message ||
-"Failed to load requests"
-);
+            toast.error(
+                err.response?.data?.message ||
+                "Failed to load requests"
+            );
 
-}
+        }
 
-finally{
+        finally {
 
-setLoading(false);
+            setLoading(false);
 
-}
+        }
 
-},[caretakerId]);
+    }, [caretakerId]);
 
 
 
 
-// ================= GET HOSTEL =================
+    // ================= GET HOSTEL =================
 
 
-const getHostel = useCallback(async()=>{
+    const getHostel = useCallback(async () => {
 
-try{
+        try {
 
-const res = await axios.get(
-`${Api.get_Caretaker_Hostel}/${caretakerId}`
-);
+            const res = await axios.get(
+                `${Api.get_Caretaker_Hostel}/${caretakerId}`
+            );
 
-setHostel(res.data.data);
+            setHostel(res.data.data);
 
-}
-catch(err){
+        }
+        catch (err) {
 
-console.log(err);
+            console.log(err);
 
-}
+        }
 
-},[caretakerId]);
+    }, [caretakerId]);
 
 
 
 
-// ================= FILTER =================
+    // ================= FILTER =================
 
 
-const activeRequests = requests.filter(
-(req)=>
-req.status?.trim().toLowerCase() !== "completed"
-);
+    const activeRequests = requests.filter(
+        (req) =>
+            req.status?.trim().toLowerCase() !== "completed"
+    );
 
-const completedRequests = requests.filter(
-(req)=>
-req.status?.trim().toLowerCase() === "completed"
-);
+    const completedRequests = requests.filter(
+        (req) =>
+            req.status?.trim().toLowerCase() === "completed"
+    );
 
 
 
-useEffect(()=>{
+    useEffect(() => {
 
-if(caretakerId){
+        if (caretakerId) {
 
-getRequests();
-getHostel();
+            getRequests();
+            getHostel();
 
-}
+        }
 
-},[
-caretakerId,
-getRequests,
-getHostel
-]);
+    }, [
+        caretakerId,
+        getRequests,
+        getHostel
+    ]);
 
 
 
 
-// ================= CREATE REQUEST =================
+    // ================= CREATE REQUEST =================
 
 
-const handleSubmit = async()=>{
+    const handleSubmit = async () => {
 
-try{
+        try {
 
-const res = await axios.post(
-Api.create_Caretaker_Request,
-{
-caretakerId,
-priority
-}
-);
+            const res = await axios.post(
+                Api.create_Caretaker_Request,
+                {
+                    caretakerId,
+                    priority
+                }
+            );
 
 
-toast.success(res.data.message);
-setPriority("Medium");
-getRequests();
+            toast.success(res.data.message);
+            setPriority("Medium");
+            getRequests();
 
 
 
 
-}
-catch(err){
+        }
+        catch (err) {
 
-toast.error(
-err.response?.data?.message ||
-"Request Failed"
-);
+            toast.error(
+                err.response?.data?.message ||
+                "Request Failed"
+            );
 
-}
+        }
 
-};
+    };
 
 
 
 
 
-return (
+    return (
 
-<div className="min-h-screen bg-[#4CBB17]/20">
+        <div className="min-h-screen bg-[#4CBB17]/20">
 
 
-<div className="bg-[#4CBB17]/40 px-4 py-4 lg:px-8 mb-6">
+            <div className="bg-[#4CBB17]/40 px-4 py-4 lg:px-8 mb-6">
 
 
-<h1 className="flex items-center gap-3 text-3xl lg:text-5xl font-extrabold text-green-900">
+                <h1 className="flex items-center gap-3 text-3xl lg:text-5xl font-extrabold text-green-900">
 
-<img
-src="/garbageVehicle.jpeg"
-className="w-12 h-12 lg:w-16 lg:h-16 object-contain"
-/>
+                    <img
+                        src="/garbageVehicle.jpeg"
+                        className="w-12 h-12 lg:w-16 lg:h-16 object-contain"
+                    />
 
-CleanTrack
+                    CleanTrack
 
-</h1>
+                </h1>
 
 
-<p className="text-gray-800 mt-2">
-Smart Waste Management Control Center
-</p>
+                <p className="text-gray-800 mt-2">
+                    Smart Waste Management Control Center
+                </p>
 
 
-</div>
+            </div>
 
 
 
 
 
-<div className="bg-green-700 text-white py-4 shadow">
+            <div className="bg-green-700 text-white py-4 shadow">
 
-<h1 className="text-center text-xl sm:text-2xl lg:text-3xl font-bold">
+                <h1 className="text-center text-xl sm:text-2xl lg:text-3xl font-bold">
 
-Caretaker Dashboard
+                    Caretaker Dashboard
 
-</h1>
+                </h1>
 
-</div>
+            </div>
 
 
 
 
 
-<div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-4 lg:p-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-4 lg:p-8">
 
 
 
-{/* CREATE REQUEST */}
+                {/* CREATE REQUEST */}
 
-<div>
+                <div>
 
-<div className="bg-white rounded-2xl shadow p-6">
+                    <div className="bg-white rounded-2xl shadow p-6">
 
 
-<h2 className="text-2xl font-bold text-green-900 mb-5">
+                        <h2 className="text-2xl font-bold text-green-900 mb-5">
 
-Create Pickup Request
+                            Create Pickup Request
 
-</h2>
+                        </h2>
 
 
 
-<label className="font-semibold">
+                        <label className="font-semibold">
 
-Assigned Hostel
+                            Assigned Hostel
 
-</label>
+                        </label>
 
 
-<input
+                        <input
 
-value={hostel?.locationName || ""}
+                            value={hostel?.locationName || ""}
 
-readOnly
+                            readOnly
 
-className="w-full border rounded-xl p-3 mt-2 bg-gray-100"
+                            className="w-full border rounded-xl p-3 mt-2 bg-gray-100"
 
-/>
+                        />
 
 
 
 
-<label className="font-semibold block mt-5">
+                        <label className="font-semibold block mt-5">
 
-Priority
+                            Priority
 
-</label>
+                        </label>
 
 
 
-<div className="grid grid-cols-3 gap-2 mt-3">
+                        <div className="grid grid-cols-3 gap-2 mt-3">
 
 
-{
-["Low","Medium","High"].map((p)=>(
+                            {
+                                ["Low", "Medium", "High"].map((p) => (
 
 
-<button
-type="button"
-key={p}
-onClick={()=>setPriority(p)}
-className={
-priority===p
-?
-"bg-green-800 text-white py-2 rounded-full"
-:
-"border py-2 rounded-full"
-}
->
-{p}
-</button>
+                                    <button
+                                        type="button"
+                                        key={p}
+                                        onClick={() => setPriority(p)}
+                                        className={
+                                            priority === p
+                                                ?
+                                                "bg-green-800 text-white py-2 rounded-full"
+                                                :
+                                                "border py-2 rounded-full"
+                                        }
+                                    >
+                                        {p}
+                                    </button>
 
 
-))
+                                ))
 
-}
+                            }
 
 
-</div>
+                        </div>
 
 
 
 
-<button
+                        <button
 
-onClick={handleSubmit}
+                            onClick={handleSubmit}
 
-className="mt-5 w-full bg-green-800 text-white py-3 rounded-xl font-bold"
+                            className="mt-5 w-full bg-green-800 text-white py-3 rounded-xl font-bold"
 
->
+                        >
 
-Create Request
+                            Create Request
 
-</button>
+                        </button>
 
 
 
-</div>
+                    </div>
 
-</div>
+                </div>
 
 
 
 
 
 
-{/* REQUEST LIST */}
+                {/* REQUEST LIST */}
 
 
-<div className="lg:col-span-2">
+                <div className="lg:col-span-2">
 
 
-<div className="bg-white rounded-2xl shadow p-6">
+                    <div className="bg-white rounded-2xl shadow p-6">
 
 
-<div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
+                        <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
 
 
 
-<div>
+                            <div>
 
-<h2 className="text-3xl font-bold text-green-900">
+                                <h2 className="text-3xl font-bold text-green-900">
 
-Pickup Requests
+                                    Pickup Requests
 
-</h2>
+                                </h2>
 
 
-<p className="text-gray-500">
+                                <p className="text-gray-500">
 
-Assigned Hostel Cleaning Requests
+                                    Assigned Hostel Cleaning Requests
 
-</p>
+                                </p>
 
 
-</div>
+                            </div>
 
 
 
 
-<select
+                            <select
 
-value={statusFilter}
+                                value={statusFilter}
 
-onChange={(e)=>setStatusFilter(e.target.value)}
+                                onChange={(e) => setStatusFilter(e.target.value)}
 
-className="border rounded-xl px-4 py-2"
+                                className="border rounded-xl px-4 py-2"
 
->
+                            >
 
 
-<option value="Active">
-All Active
-</option>
+                                <option value="Active">
+                                    All Active
+                                </option>
 
 
-<option value="Completed">
-Completed
-</option>
+                                <option value="Completed">
+                                    Completed
+                                </option>
 
 
-</select>
+                            </select>
 
 
 
-</div>
+                        </div>
 
 
 
@@ -364,120 +364,120 @@ Completed
 
 
 
-{
-loading ?
+                        {
+                            loading ?
 
-<div className="text-center py-10 text-blue-600 font-semibold">
+                                <div className="text-center py-10 text-blue-600 font-semibold">
 
-Loading Requests...
+                                    Loading Requests...
 
-</div>
+                                </div>
 
 
-:
+                                :
 
 
-statusFilter==="Active"
+                                statusFilter === "Active"
 
 
-?
+                                    ?
 
-activeRequests.length===0
+                                    activeRequests.length === 0
 
-?
+                                        ?
 
-<Empty/>
+                                        <Empty />
 
-:
+                                        :
 
 
-<>
+                                        <>
 
-<h2 className="text-2xl font-bold text-green-700 mb-4">
+                                            <h2 className="text-2xl font-bold text-green-700 mb-4">
 
-Active Requests ({activeRequests.length})
+                                                Active Requests ({activeRequests.length})
 
-</h2>
+                                            </h2>
 
 
-<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
 
-{
-activeRequests.map((req)=>(
+                                                {
+                                                    activeRequests.map((req) => (
 
-<RequestCard
-key={req._id}
-req={req}
-/>
+                                                        <RequestCard
+                                                            key={req._id}
+                                                            req={req}
+                                                        />
 
-))
-}
+                                                    ))
+                                                }
 
 
-</div>
+                                            </div>
 
-</>
+                                        </>
 
 
-:
+                                    :
 
 
-completedRequests.length===0
+                                    completedRequests.length === 0
 
-?
+                                        ?
 
-<Empty/>
+                                        <Empty />
 
-:
+                                        :
 
 
-<>
+                                        <>
 
-<h2 className="text-2xl font-bold text-blue-700 mb-4">
+                                            <h2 className="text-2xl font-bold text-blue-700 mb-4">
 
-Completed Requests ({completedRequests.length})
+                                                Completed Requests ({completedRequests.length})
 
-</h2>
+                                            </h2>
 
 
-<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
 
-{
-completedRequests.map((req)=>(
+                                                {
+                                                    completedRequests.map((req) => (
 
-<RequestCard
-key={req._id}
-req={req}
-/>
+                                                        <RequestCard
+                                                            key={req._id}
+                                                            req={req}
+                                                        />
 
-))
-}
+                                                    ))
+                                                }
 
 
-</div>
+                                            </div>
 
 
-</>
+                                        </>
 
 
-}
+                        }
 
 
-</div>
+                    </div>
 
 
-</div>
+                </div>
 
 
-</div>
+            </div>
 
 
 
-</div>
+        </div>
 
-);
+    );
 
 }
 
@@ -488,25 +488,25 @@ req={req}
 // ================= EMPTY =================
 
 
-function Empty(){
+function Empty() {
 
-return(
+    return (
 
-<div className="text-center py-16">
+        <div className="text-center py-16">
 
-<div className="text-6xl">
-🧹
-</div>
+            <div className="text-6xl">
+                🧹
+            </div>
 
-<h2 className="text-2xl font-bold text-gray-500 mt-3">
+            <h2 className="text-2xl font-bold text-gray-500 mt-3">
 
-No Requests Found
+                No Requests Found
 
-</h2>
+            </h2>
 
-</div>
+        </div>
 
-)
+    )
 
 }
 
@@ -517,254 +517,209 @@ No Requests Found
 // ================= CARD =================
 
 
-function RequestCard({req}){
+function RequestCard({ req }) {
 
-const status = req.status?.trim().toLowerCase();
+    const status = req.status?.trim().toLowerCase();
 
-return(
+    return (
 
-<div
-className={`
-rounded-2xl
-p-5
-border-2
-transition
-hover:shadow-lg
+        <div
+            className={`rounded-2xl p-5 border-2 transition hover:shadow-lg
+           ${req.isOverdue && status !== "completed" ?
+                    "border-red-400 bg-red-50" :
+                    "border-gray-200 bg-white"
 
-${
-req.isOverdue && status !== "completed"
-
-?
-"border-red-400 bg-red-50"
-
-:
-
-"border-gray-200 bg-white"
-
-}
+                }
 
 `}
->
+        >
 
 
-<div className="flex justify-between items-start gap-4">
+            <div className="flex justify-between items-start gap-4">
 
 
-<h3 className="text-xl font-semibold text-green-800">
+                <h3 className="text-xl font-semibold text-green-800">
 
-📍 {req.location?.locationName}
+                    📍 {req.location?.locationName}
 
-</h3>
+                </h3>
 
 
 
-<div className="flex flex-col gap-2 items-end">
+                <div className="flex flex-col gap-2 items-end">
 
 
 
-{/* COMPLETED ONLY */}
+                    {/* COMPLETED ONLY */}
 
-{
-status==="completed" &&
+                    {
+                        status === "completed" &&
 
-<span
-className="
-bg-green-600
-text-white
-px-3
-py-1
-rounded-full
-text-xs
-font-bold
-"
->
+                        <span
+                            className="bg-green-600 text-white px-3 py-1 rounded-full text-xs font-bold"
+                        >
 
-Completed
+                            Completed
 
-</span>
+                        </span>
 
-}
+                    }
 
 
 
 
-{/* SCHEDULED + OVERDUE */}
+                    {/* SCHEDULED + OVERDUE */}
 
-{
-status!=="completed" &&
-req.scheduledDate &&
+                    {
+                        status !== "completed" &&
+                        req.scheduledDate &&
 
-<span
-className="
-bg-sky-500
-text-white
-px-3
-py-1
-rounded-full
-text-xs
-font-bold
-"
->
+                        <span
+                            className="bg-sky-500 text-white px-3 py-1 rounded-full text-xs font-bold"
+                        >
 
-Scheduled
+                            Scheduled
 
-</span>
+                        </span>
 
-}
+                    }
 
 
 
 
-{
-status!=="completed" &&
-req.isOverdue &&
+                    {
+                        status !== "completed" &&
+                        req.isOverdue &&
 
-<span
-className="
-bg-red-600
-text-white
-px-3
-py-1
-rounded-full
-text-xs
-font-bold
-animate-pulse
-"
->
+                        <span
+                            className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse"
+                        >
 
-OVERDUE
+                            OVERDUE
 
-</span>
+                        </span>
 
-}
+                    }
 
 
 
 
-{/* PENDING */}
+                    {/* PENDING */}
 
-{
-status!=="completed" &&
-!req.scheduledDate &&
-!req.isOverdue &&
+                    {
+                        status !== "completed" &&
+                        !req.scheduledDate &&
+                        !req.isOverdue &&
 
-<span
-className="
-bg-yellow-400
-text-black
-px-3
-py-1
-rounded-full
-text-xs
-font-bold
-"
->
+                        <span
+                            className="bg-yellow-400 text-black px-3 py-1 rounded-full text-xs font-bold"
+                        >
 
-Pending
+                            Pending
 
-</span>
+                        </span>
 
-}
+                    }
 
 
 
-</div>
+                </div>
 
 
 
-</div>
+            </div>
 
 
 
 
 
-<p className="mt-5">
+            <p className="mt-5">
 
-Priority :
+                Priority :
 
-<b>{req.priority}</b>
+                <b>{req.priority}</b>
 
-</p>
+            </p>
 
 
 
 
 
-<p className="text-sm text-gray-500 mt-2">
+            <p className="text-sm text-gray-500 mt-2">
 
-Created :
+                Created :
 
-{new Date(req.createdAt).toLocaleString("en-IN")}
+                {new Date(req.createdAt).toLocaleString("en-IN")}
 
-</p>
+            </p>
 
 
 
 
 
-{/* Scheduled Date */}
+            {/* Scheduled Date */}
 
-{
-req.scheduledDate &&
+            {
+                req.scheduledDate &&
 
-<p className="text-sm text-sky-700 mt-2 font-medium">
+                <p className="text-sm text-sky-700 mt-2 font-medium">
 
-Scheduled :
+                    Scheduled :
 
-{new Date(req.scheduledDate).toLocaleDateString("en-IN")}
+                    {new Date(req.scheduledDate).toLocaleDateString("en-IN")}
 
-{" | "}
+                    {" | "}
 
-{req.scheduledTime}
+                    {req.scheduledTime}
 
-</p>
+                </p>
 
-}
+            }
 
 
 
 
 
 
-{/* Arrived */}
+            {/* Arrived */}
 
-{
-req.arrivedAt &&
+            {
+                req.arrivedAt &&
 
-<p className="text-sm text-orange-700 mt-2 font-medium">
+                <p className="text-sm text-orange-700 mt-2 font-medium">
 
-Arrived :
+                    Arrived :
 
-{new Date(req.arrivedAt).toLocaleString("en-IN")}
+                    {new Date(req.arrivedAt).toLocaleString("en-IN")}
 
-</p>
+                </p>
 
-}
+            }
 
 
 
 
 
-{/* Completed */}
+            {/* Completed */}
 
-{
-req.completedAt &&
+            {
+                req.completedAt &&
 
-<p className="text-sm text-green-700 mt-2 font-medium">
+                <p className="text-sm text-green-700 mt-2 font-medium">
 
-Completed :
+                    Completed :
 
-{new Date(req.completedAt).toLocaleString("en-IN")}
+                    {new Date(req.completedAt).toLocaleString("en-IN")}
 
-</p>
+                </p>
 
-}
+            }
 
 
 
-</div>
+        </div>
 
 
-)
+    )
 
 }

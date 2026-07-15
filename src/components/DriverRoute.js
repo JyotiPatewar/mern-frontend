@@ -1,198 +1,197 @@
-import { useEffect, useState,useCallback  } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import Api from "../api/Api";
 import { toast } from "react-toastify";
+
 export default function DriverRoute() {
+
   const { id } = useParams();
   const navigate = useNavigate();
 
   const [task, setTask] = useState(null);
-  const [driverLocation, setDriverLocation] =
-  useState(null);
+  const [driverLocation, setDriverLocation] = useState(null);
 
-const [isNearLocation, setIsNearLocation] =
-  useState(false);
-  const [distance, setDistance] =
-  useState(null);
+  const [isNearLocation, setIsNearLocation] = useState(false);
+  const [distance, setDistance] = useState(null);
 
 
-const getTask = useCallback(async () => {
-  try {
-    const res = await axios.get(Api.get_Todays_Task);
+  const getTask = useCallback(async () => {
+    try {
+      const res = await axios.get(Api.get_Todays_Task);
 
-    const found = res.data.requests.find(
-      (item) => item._id === id
-    );
+      const found = res.data.requests.find(
+        (item) => item._id === id
+      );
 
-    setTask(found);
-  } catch (error) {
-    console.log(error);
-  }
-}, [id]);
+      setTask(found);
+    } catch (error) {
+      console.log(error);
+    }
+  }, [id]);
 
   useEffect(() => {
     getTask();
   }, [getTask]);
 
-const markArrived = async () => {
+  const markArrived = async () => {
 
-  if (!isNearLocation) {
-    return toast.warning(
-      "You must be near destination"
-    );
-  }
+    if (!isNearLocation) {
+      return toast.warning(
+        "You must be near destination"
+      );
+    }
 
-  try {
+    try {
 
-    const res = await axios.put(
-      `${Api.arrived_At_Task}/${id}`
-    );
-
-
-    console.log("ARRIVED RESPONSE",res.data);
+      const res = await axios.put(
+        `${Api.arrived_At_Task}/${id}`
+      );
 
 
-    setTask(prev => ({
-      ...prev,
-      status:"Arrived",
-      arrivedAt:new Date()
-    }));
+      console.log("ARRIVED RESPONSE", res.data);
 
 
-    toast.success("Driver Arrived");
+      setTask(prev => ({
+        ...prev,
+        status: "Arrived",
+        arrivedAt: new Date()
+      }));
 
 
-  } catch(error){
+      toast.success("Driver Arrived");
 
-    console.log(error);
 
-  }
-};
+    } catch (error) {
+
+      console.log(error);
+
+    }
+  };
   const calculateDistance = (
-  lat1,
-  lon1,
-  lat2,
-  lon2
-) => {
-  const R = 6371e3;
+    lat1,
+    lon1,
+    lat2,
+    lon2
+  ) => {
+    const R = 6371e3;
 
-  const φ1 = (lat1 * Math.PI) / 180;
-  const φ2 = (lat2 * Math.PI) / 180;
+    const φ1 = (lat1 * Math.PI) / 180;
+    const φ2 = (lat2 * Math.PI) / 180;
 
-  const Δφ =
-    ((lat2 - lat1) * Math.PI) / 180;
+    const Δφ =
+      ((lat2 - lat1) * Math.PI) / 180;
 
-  const Δλ =
-    ((lon2 - lon1) * Math.PI) / 180;
+    const Δλ =
+      ((lon2 - lon1) * Math.PI) / 180;
 
-  const a =
-    Math.sin(Δφ / 2) *
+    const a =
+      Math.sin(Δφ / 2) *
       Math.sin(Δφ / 2) +
-    Math.cos(φ1) *
+      Math.cos(φ1) *
       Math.cos(φ2) *
       Math.sin(Δλ / 2) *
       Math.sin(Δλ / 2);
 
-  const c =
-    2 *
-    Math.atan2(
-      Math.sqrt(a),
-      Math.sqrt(1 - a)
-    );
+    const c =
+      2 *
+      Math.atan2(
+        Math.sqrt(a),
+        Math.sqrt(1 - a)
+      );
 
-  return R * c;
-};
-
-useEffect(() => {
-  if (!navigator.geolocation) {
-    toast.error("Geolocation not supported");
-    return;
-  }
-
-  const watchId =
-    navigator.geolocation.watchPosition(
-      (position) => {
-        setDriverLocation({
-          latitude:
-            position.coords.latitude,
-          longitude:
-            position.coords.longitude,
-        });
-      },
-      (error) => {
-  console.log(error);
-
-toast.error(
-  "Location access required. Please allow GPS permission."
-);
-},
-     {
-  enableHighAccuracy: true,
-  timeout: 10000,
-  maximumAge: 0,
-}
-    );
-
-  return () => {
-    navigator.geolocation.clearWatch(
-      watchId
-    );
+    return R * c;
   };
-}, []);
+
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      toast.error("Geolocation not supported");
+      return;
+    }
+
+    const watchId =
+      navigator.geolocation.watchPosition(
+        (position) => {
+          setDriverLocation({
+            latitude:
+              position.coords.latitude,
+            longitude:
+              position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.log(error);
+
+          toast.error(
+            "Location access required. Please allow GPS permission."
+          );
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0,
+        }
+      );
+
+    return () => {
+      navigator.geolocation.clearWatch(
+        watchId
+      );
+    };
+  }, []);
 
 
 
-useEffect(() => {
-  if (
-    !driverLocation ||
-    !task?.location?.latitude ||
-    !task?.location?.longitude
-  )
-    return;
+  useEffect(() => {
+    if (
+      !driverLocation ||
+      !task?.location?.latitude ||
+      !task?.location?.longitude
+    )
+      return;
 
-  const distance = calculateDistance(
-    driverLocation.latitude,
-    driverLocation.longitude,
-    Number(task.location.latitude),
-    Number(task.location.longitude)
-  );
-
-  console.log(
-    "Distance:",
-    distance,
-    "meters"
-  );
-
-  setDistance(distance);
-setIsNearLocation(distance <= 100);
-}, [driverLocation, task]);
-
- const markCompleted = async () => {
-  if (!isNearLocation) {
-    return toast.warning(
-      "You must be near the destination location."
+    const distance = calculateDistance(
+      driverLocation.latitude,
+      driverLocation.longitude,
+      Number(task.location.latitude),
+      Number(task.location.longitude)
     );
-  }
 
-  try {
-   const res = await axios.put(
-  `${Api.completed_Task}/${id}`,
-  {
- latitude: driverLocation?.latitude,
-longitude: driverLocation?.longitude,
-  }
-);
+    console.log(
+      "Distance:",
+      distance,
+      "meters"
+    );
 
-    setTask(res.data.data);
+    setDistance(distance);
+    setIsNearLocation(distance <= 100);
+  }, [driverLocation, task]);
 
-    setTimeout(() => {
-      navigate("/driver-dashboard");
-    }, 2000);
-  } catch (error) {
-    console.log(error);
-  }
-};
+  const markCompleted = async () => {
+    if (!isNearLocation) {
+      return toast.warning(
+        "You must be near the destination location."
+      );
+    }
+
+    try {
+      const res = await axios.put(
+        `${Api.completed_Task}/${id}`,
+        {
+          latitude: driverLocation?.latitude,
+          longitude: driverLocation?.longitude,
+        }
+      );
+
+      setTask(res.data.data);
+
+      setTimeout(() => {
+        navigate("/driver-dashboard");
+      }, 2000);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   if (!task) {
     return (
       <div className="min-h-screen flex justify-center items-center text-2xl font-bold">
@@ -228,7 +227,7 @@ longitude: driverLocation?.longitude,
       {/* Live Tracking Banner */}
       <div className="bg-green-700 text-white py-4 shadow-lg">
         <h1 className="text-center text-3xl font-bold">
-           Live Route Tracking
+          Live Route Tracking
         </h1>
       </div>
 
@@ -247,36 +246,36 @@ longitude: driverLocation?.longitude,
           <div className="space-y-3">
 
             <p className="text-lg font-semibold">
-               Start Location:
+              Start Location:
               <span className="text-green-800 ml-2">
                 MANIT Bhopal
               </span>
             </p>
 
             <p className="text-lg font-semibold">
-               Destination:
+              Destination:
               <span className="text-green-800 ml-2">
                 {task.location?.locationName}
               </span>
             </p>
-{driverLocation && (
-  <div className="mt-3 bg-blue-50 p-3 rounded-lg">
-    <p className="text-sm">
-      Driver Latitude: {driverLocation.latitude}
-    </p>
+            {driverLocation && (
+              <div className="mt-3 bg-blue-50 p-3 rounded-lg">
+                <p className="text-sm">
+                  Driver Latitude: {driverLocation.latitude}
+                </p>
 
-    <p className="text-sm">
-      Driver Longitude: {driverLocation.longitude}
-    </p>
+                <p className="text-sm">
+                  Driver Longitude: {driverLocation.longitude}
+                </p>
 
-    {distance !== null && (
-      <p className="text-sm font-semibold text-blue-700">
-        Distance from destination:
-        {Math.round(distance)} meters
-      </p>
-    )}
-  </div>
-)}
+                {distance !== null && (
+                  <p className="text-sm font-semibold text-blue-700">
+                    Distance from destination:
+                    {Math.round(distance)} meters
+                  </p>
+                )}
+              </div>
+            )}
           </div>
 
         </div>
@@ -286,7 +285,7 @@ longitude: driverLocation?.longitude,
 
           <iframe
             title="Google Route"
-            width="100%" 
+            width="100%"
             height="280"
             className="border-0"
             loading="lazy"
@@ -301,10 +300,10 @@ longitude: driverLocation?.longitude,
 
         <div className="bg-white rounded-2xl shadow-lg p-6">
 
-      
 
-       
-        
+
+
+
 
           {/* Arrived */}
           {task.arrivedAt && (
@@ -336,7 +335,7 @@ longitude: driverLocation?.longitude,
             <div className="bg-green-50 border border-green-300 p-4 rounded-xl mb-4">
 
               <p className="font-bold text-green-700">
-                 Completed
+                Completed
               </p>
 
               <p className="mt-1">
@@ -355,46 +354,44 @@ longitude: driverLocation?.longitude,
 
             </div>
           )}
-{!isNearLocation && (
-  <div className="bg-red-100 border border-red-300 text-red-700 p-3 rounded-lg mb-4 text-center">
-    Move closer to the destination (within 100 meters) to update status
-  </div>
-)}
+          {!isNearLocation && (
+            <div className="bg-red-100 border border-red-300 text-red-700 p-3 rounded-lg mb-4 text-center">
+              Move closer to the destination (within 100 meters) to update status
+            </div>
+          )}
 
           {/* Buttons */}
           <div className="flex justify-center mt-6">
 
             {task.status === "Scheduled" && (
-            <button
-  onClick={markArrived}
-  disabled={!isNearLocation}
-  className={`px-10 py-3 rounded-xl text-lg font-bold shadow-lg
-  ${
-    isNearLocation
-      ? "bg-yellow-500 hover:bg-yellow-600 text-white"
-      : "bg-gray-400 cursor-not-allowed text-white"
-  }`}
->
-  Mark Arrived
-</button>
+              <button
+                onClick={markArrived}
+                disabled={!isNearLocation}
+                className={`px-10 py-3 rounded-xl text-lg font-bold shadow-lg
+  ${isNearLocation
+                    ? "bg-yellow-500 hover:bg-yellow-600 text-white"
+                    : "bg-gray-400 cursor-not-allowed text-white"
+                  }`}
+              >
+                Mark Arrived
+              </button>
             )}
 
-      {task.status === "Arrived" && task.arrivedAt && (
+            {task.status === "Arrived" && task.arrivedAt && (
 
-<button
- onClick={markCompleted}
- disabled={!isNearLocation}
- className={`px-10 py-3 rounded-xl text-lg font-bold shadow-lg
- ${
- isNearLocation
- ? "bg-green-600 hover:bg-green-700 text-white"
- : "bg-gray-400 cursor-not-allowed text-white"
- }`}
->
- Mark Completed
-</button>
+              <button
+                onClick={markCompleted}
+                disabled={!isNearLocation}
+                className={`px-10 py-3 rounded-xl text-lg font-bold shadow-lg
+ ${isNearLocation
+                    ? "bg-green-600 hover:bg-green-700 text-white"
+                    : "bg-gray-400 cursor-not-allowed text-white"
+                  }`}
+              >
+                Mark Completed
+              </button>
 
-)}
+            )}
 
           </div>
 

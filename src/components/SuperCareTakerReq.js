@@ -15,7 +15,6 @@ export default function CaretakerRequests() {
   }, []);
 
 
-
   const getRequests = async () => {
 
     try {
@@ -51,12 +50,12 @@ export default function CaretakerRequests() {
 
 
     }
-    catch(err){
+    catch (err) {
 
       console.log(err);
 
     }
-    finally{
+    finally {
 
       setLoading(false);
 
@@ -70,17 +69,17 @@ export default function CaretakerRequests() {
 
   return (
 
-<div className="min-h-screen bg-green-100">
+    <div className="min-h-screen bg-green-100">
 
 
-<div className="
+      <div className="
 bg-[#4CBB17]/40 
 px-4 
 md:px-8 
 py-4
 ">
 
-<div className="
+        <div className="
 flex 
 flex-col 
 md:flex-row 
@@ -89,13 +88,13 @@ justify-between
 ">
 
 
-<div className="
+          <div className="
 text-center 
 md:text-left
 ">
 
 
-<h1 className="
+            <h1 className="
 flex
 items-center
 gap-3
@@ -105,56 +104,56 @@ font-extrabold
 text-green-900
 ">
 
-<img
-src="/garbageVehicle.jpeg"
-alt="logo"
-className="w-12 h-12"
-/>
+              <img
+                src="/garbageVehicle.jpeg"
+                alt="logo"
+                className="w-12 h-12"
+              />
 
 
-CleanTrack
+              CleanTrack
 
 
-</h1>
+            </h1>
 
 
-<p className="
+            <p className="
 text-gray-800 
 mt-1
 ">
 
-Smart Waste Management Control Center
+              Smart Waste Management Control Center
 
-</p>
-
-
-</div>
+            </p>
 
 
-</div>
-
-</div>
+          </div>
 
 
+        </div>
+
+      </div>
 
 
 
-<h1 className="
+
+
+      <h1 className="
 text-3xl
 font-bold
 text-green-900
 p-6
 ">
 
-Caretaker Requests
+        Caretaker Requests
 
-</h1>
-
-
+      </h1>
 
 
 
-<div className="
+
+
+      <div className="
 grid
 grid-cols-1
 md:grid-cols-2
@@ -165,67 +164,67 @@ p-6
 
 
 
-{
-loading ?
+        {
+          loading ?
 
 
-<div className="
+            <div className="
 col-span-full
 flex
 justify-center
 py-20
 ">
 
-<h2 className="
+              <h2 className="
 text-xl
 font-bold
 text-green-800
 animate-pulse
 ">
 
-Loading Caretaker Requests...
+                Loading Caretaker Requests...
 
-</h2>
+              </h2>
 
-</div>
-
-
-
-:
-
-requests.length === 0 ?
+            </div>
 
 
-<div className="
+
+            :
+
+            requests.length === 0 ?
+
+
+              <div className="
 col-span-full
 flex
 justify-center
 py-20
 ">
 
-<h2 className="
+                <h2 className="
 text-xl
 font-bold
 text-red-600
 ">
 
-No Requests Found
+                  No Requests Found
 
-</h2>
+                </h2>
 
-</div>
-
-
-
-:
+              </div>
 
 
-requests.map((req)=>(
+
+              :
 
 
-<div
-key={req._id}
-className="
+              requests.map((req) => (
+
+
+                <div
+                  key={req._id}
+                  className="
 bg-white
 rounded-2xl
 shadow
@@ -233,212 +232,175 @@ p-5
 border
 relative
 "
->
+                >
 
 
 
-<div className="
-absolute
-top-4
-right-4
-">
+                  <div
+                    className="
+  absolute
+  top-4
+  right-4
+  flex
+  items-center
+  gap-2
+  flex-wrap
+  "
+                  >
+                    <span
+                      className={
+                        req.status === "Completed"
+                          ? "bg-green-600 text-white px-4 py-1 rounded-full text-sm"
+                          : req.status === "Scheduled"
+                            ? "bg-sky-500 text-white px-4 py-1 rounded-full text-sm"
+                            : req.status === "Arrived"
+                              ? "bg-orange-500 text-white px-4 py-1 rounded-full text-sm"
+                              : "bg-yellow-400 text-black px-4 py-1 rounded-full text-sm"
+                      }
+                    >
+                      {req.status}
+                    </span>
 
-
-<span
-
-className={
-
-req.status==="Completed"
-
-?
-
-"bg-green-600 text-white px-4 py-1 rounded-full"
-
-:
-
-req.status==="Scheduled"
-
-?
-
-"bg-sky-500 text-white px-4 py-1 rounded-full"
-
-:
-
-req.status==="Arrived"
-
-?
-
-"bg-orange-500 text-white px-4 py-1 rounded-full"
-
-:
-
-"bg-yellow-400 px-4 py-1 rounded-full"
-
-}
-
->
-
-{req.status}
-
-</span>
-
-
-</div>
+                    {req.isOverdue && (
+                      <span
+                        className="
+      bg-red-600
+      text-white
+      px-3
+      py-1
+      rounded-full
+      text-sm
+      "
+                      >
+                        OVERDUE
+                      </span>
+                    )}
+                  </div>
 
 
 
 
 
-<h2 className="
+                  <h2 className="
 text-xl
 font-bold
 text-green-800
 mb-3
 ">
 
-📍 {req.location?.locationName || "Unknown Location"}
+                    📍 {req.location?.locationName || "Unknown Location"}
 
-</h2>
-
-
-
-
-
-<p className="mt-2">
-
-<b>
-Caretaker :
-</b>{" "}
-
-{req.requestedBy?.name || "N/A"}
-
-</p>
-
-
-
-
-<p>
-
-<b>
-Mobile :
-</b>{" "}
-
-{req.requestedBy?.mobile || "N/A"}
-
-</p>
+                  </h2>
 
 
 
 
 
-<p className="mt-2">
+                  <p className="mt-2">
 
-<b>
-Priority :
-</b>{" "}
+                    <b>
+                      Caretaker :
+                    </b>{" "}
 
-{req.priority}
+                    {req.requestedBy?.name || "N/A"}
 
-</p>
-
-
+                  </p>
 
 
 
 
-{
-req.isOverdue &&
+                  <p>
 
-<span
-className="
-inline-block
-mt-3
-bg-red-600
-text-white
-px-3
-py-1
-rounded-full
-"
->
+                    <b>
+                      Mobile :
+                    </b>{" "}
 
-OVERDUE
+                    {req.requestedBy?.mobile || "N/A"}
 
-</span>
-
-}
+                  </p>
 
 
 
 
 
+                  <p className="mt-2">
 
-{
-req.scheduledDate &&
+                    <b>
+                      Priority :
+                    </b>{" "}
 
-<p className="
+                    {req.priority}
+
+                  </p>
+
+
+                  {
+                    req.scheduledDate &&
+
+                    <p className="
 text-sky-700
 mt-3
 font-medium
 ">
 
-Scheduled :
+                      Scheduled :
 
-{req.scheduledDate}
+                      {req.scheduledDate}
 
-{" | "}
+                      {" | "}
 
-{req.scheduledTime}
-
-
-</p>
-
-}
+                      {req.scheduledTime}
 
 
+                    </p>
+
+                  }
 
 
 
 
 
-{
-req.completedAt &&
 
-<p className="
+
+                  {
+                    req.completedAt &&
+
+                    <p className="
 text-green-700
 mt-3
 font-medium
 ">
 
-Completed :
+                      Completed :
 
-{
-new Date(req.completedAt)
-.toLocaleString("en-IN")
-}
-
-
-</p>
-
-}
+                      {
+                        new Date(req.completedAt)
+                          .toLocaleString("en-IN")
+                      }
 
 
+                    </p>
 
-
-</div>
-
-
-))
-
-
-}
+                  }
 
 
 
-</div>
+
+                </div>
+
+
+              ))
+
+
+        }
 
 
 
-</div>
+      </div>
+
+
+
+    </div>
 
 
   );
